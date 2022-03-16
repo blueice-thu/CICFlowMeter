@@ -15,7 +15,7 @@ import java.util.List;
 import static cic.cs.unb.ca.jnetpcap.Utils.*;
 
 
-public class ReadPcapFileWorker extends SwingWorker<List<String>,String> {
+public class ReadPcapFileWorker extends SwingWorker<List<String>, String> {
 
     public static final Logger logger = LoggerFactory.getLogger(ReadPcapFileWorker.class);
     public static final String PROPERTY_FILE_CNT = "file_count";
@@ -25,8 +25,8 @@ public class ReadPcapFileWorker extends SwingWorker<List<String>,String> {
 
     private long flowTimeout;
     private long activityTimeout;
-    private int     totalFlows = 0;
-    
+    private int totalFlows = 0;
+
     private File pcapPath;
     private String outPutDirectory;
     private List<String> chunks;
@@ -37,20 +37,20 @@ public class ReadPcapFileWorker extends SwingWorker<List<String>,String> {
         outPutDirectory = outPutDir;
         chunks = new ArrayList<>();
 
-        if(!outPutDirectory.endsWith(FILE_SEP)) {
+        if (!outPutDirectory.endsWith(FILE_SEP)) {
             outPutDirectory = outPutDirectory + FILE_SEP;
         }
         flowTimeout = 120000000L;
         activityTimeout = 5000000L;
     }
 
-    public ReadPcapFileWorker(File inputFile, String outPutDir,long param1,long param2) {
+    public ReadPcapFileWorker(File inputFile, String outPutDir, long param1, long param2) {
         super();
         pcapPath = inputFile;
         outPutDirectory = outPutDir;
         chunks = new ArrayList<>();
 
-        if(!outPutDirectory.endsWith(FILE_SEP)) {
+        if (!outPutDirectory.endsWith(FILE_SEP)) {
             outPutDirectory = outPutDirectory + FILE_SEP;
         }
         flowTimeout = param1;
@@ -61,7 +61,7 @@ public class ReadPcapFileWorker extends SwingWorker<List<String>,String> {
     protected List<String> doInBackground() {
 
         if (pcapPath.isDirectory()) {
-            readPcapDir(pcapPath,outPutDirectory);
+            readPcapDir(pcapPath, outPutDirectory);
         } else {
 
             if (!isPcapFile(pcapPath)) {
@@ -72,8 +72,8 @@ public class ReadPcapFileWorker extends SwingWorker<List<String>,String> {
                 publish("");
                 publish("");
 
-                firePropertyChange(PROPERTY_CUR_FILE,"",pcapPath.getName());
-                firePropertyChange(PROPERTY_FILE_CNT,1,1);//begin with 1
+                firePropertyChange(PROPERTY_CUR_FILE, "", pcapPath.getName());
+                firePropertyChange(PROPERTY_FILE_CNT, 1, 1);//begin with 1
                 readPcapFile(pcapPath.getPath(), outPutDirectory);
             }
         }
@@ -95,11 +95,11 @@ public class ReadPcapFileWorker extends SwingWorker<List<String>,String> {
     @Override
     protected void process(List<String> chunks) {
         super.process(chunks);
-        firePropertyChange("progress","",chunks);
+        firePropertyChange("progress", "", chunks);
     }
 
     private void readPcapDir(File inputPath, String outPath) {
-        if(inputPath==null||outPath==null) {
+        if (inputPath == null || outPath == null) {
             return;
         }
 
@@ -112,21 +112,21 @@ public class ReadPcapFileWorker extends SwingWorker<List<String>,String> {
         publish("");
         publish("");
 
-        for(int i=0;i<file_cnt;i++) {
+        for (int i = 0; i < file_cnt; i++) {
             File file = pcapFiles[i];
             if (file.isDirectory()) {
                 continue;
             }
-            firePropertyChange(PROPERTY_CUR_FILE,"",file.getName());
-            firePropertyChange(PROPERTY_FILE_CNT,file_cnt,i+1);//begin with 1
-            readPcapFile(file.getPath(),outPath);
+            firePropertyChange(PROPERTY_CUR_FILE, "", file.getName());
+            firePropertyChange(PROPERTY_FILE_CNT, file_cnt, i + 1);//begin with 1
+            readPcapFile(file.getPath(), outPath);
         }
 
     }
 
     private void readPcapFile(String inputFile, String outPath) {
 
-        if(inputFile==null ||outPath==null ) {
+        if (inputFile == null || outPath == null) {
             return;
         }
 
@@ -134,11 +134,11 @@ public class ReadPcapFileWorker extends SwingWorker<List<String>,String> {
         String fileName = p.getFileName().toString();//FilenameUtils.getName(inputFile);
 
 
-        if(!outPath.endsWith(FILE_SEP)){
+        if (!outPath.endsWith(FILE_SEP)) {
             outPath += FILE_SEP;
         }
 
-        File saveFileFullPath = new File(outPath+fileName+Utils.FLOW_SUFFIX);
+        File saveFileFullPath = new File(outPath + fileName + Utils.FLOW_SUFFIX);
 
         if (saveFileFullPath.exists()) {
             if (!saveFileFullPath.delete()) {
@@ -152,24 +152,24 @@ public class ReadPcapFileWorker extends SwingWorker<List<String>,String> {
         boolean readIP6 = false;
         boolean readIP4 = true;
         PacketReader packetReader = new PacketReader(inputFile, readIP4, readIP6);
-        publish(String.format("Working on... %s",inputFile));
-        logger.debug("Working on... {}",inputFile);
+        publish(String.format("Working on... %s", inputFile));
+        logger.debug("Working on... {}", inputFile);
 
-        int nValid=0;
-        int nTotal=0;
+        int nValid = 0;
+        int nTotal = 0;
         int nDiscarded = 0;
         long start = System.currentTimeMillis();
-        while(true) {
-            try{
+        while (true) {
+            try {
                 BasicPacketInfo basicPacket = packetReader.nextPacket();
                 nTotal++;
-                if(basicPacket !=null){
+                if (basicPacket != null) {
                     flowGen.addPacket(basicPacket);
                     nValid++;
-                }else{
+                } else {
                     nDiscarded++;
                 }
-            }catch(PcapClosedException e){
+            } catch (PcapClosedException e) {
                 break;
             }
         }
@@ -180,10 +180,10 @@ public class ReadPcapFileWorker extends SwingWorker<List<String>,String> {
         long end = System.currentTimeMillis();
 
         chunks.clear();
-        chunks.add(String.format("Done! Total %d flows",lines));
-        chunks.add(String.format("Packets stats: Total=%d,Valid=%d,Discarded=%d",nTotal,nValid,nDiscarded));
+        chunks.add(String.format("Done! Total %d flows", lines));
+        chunks.add(String.format("Packets stats: Total=%d,Valid=%d,Discarded=%d", nTotal, nValid, nDiscarded));
         chunks.add(DividingLine);
-        publish(chunks.toArray( new String[chunks.size()]));
+        publish(chunks.toArray(new String[chunks.size()]));
 
         /*chunks.add(String.format("\t Total packets: %d",nTotal));
         chunks.add(String.format("\t Valid packets: %d",nValid));
@@ -210,7 +210,7 @@ public class ReadPcapFileWorker extends SwingWorker<List<String>,String> {
 
         @Override
         public void onFlowGenerated(BasicFlow flow) {
-            firePropertyChange(PROPERTY_FLOW,fileName,flow);
+            firePropertyChange(PROPERTY_FLOW, fileName, flow);
         }
     }
 

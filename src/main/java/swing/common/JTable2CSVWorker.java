@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class JTable2CSVWorker extends SwingWorker<String,String> {
+public class JTable2CSVWorker extends SwingWorker<String, String> {
     protected static final Logger logger = LoggerFactory.getLogger(JTable2CSVWorker.class);
 
     private JTable table;
@@ -23,7 +23,7 @@ public class JTable2CSVWorker extends SwingWorker<String,String> {
         }
 
         if (file.isDirectory()) {
-            throw new IllegalArgumentException(file.toString()+" is NOT a file!!!");
+            throw new IllegalArgumentException(file.toString() + " is NOT a file!!!");
         }
 
         this.table = table;
@@ -65,7 +65,7 @@ public class JTable2CSVWorker extends SwingWorker<String,String> {
                 csv.write(tableRow.toString() + Sys.LINE_SEP);
             }
 
-        }catch (IOException e) {
+        } catch (IOException e) {
             logger.debug(e.getMessage());
             logger.info("JTable2CSVWorker: {}", e.getMessage());
         } finally {

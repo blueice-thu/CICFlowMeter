@@ -1,6 +1,7 @@
 package swing.common;
 
 //import cic.cs.unb.ca.uup.ui.Constants;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +12,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.Vector;
 
-public class CsvPickerPane extends JPanel{
+public class CsvPickerPane extends JPanel {
     protected static final Logger logger = LoggerFactory.getLogger(CsvPickerPane.class);
 
     private JFileChooser fileChooser;
@@ -21,55 +22,6 @@ public class CsvPickerPane extends JPanel{
     private JButton btnBrowse;
     private JButton btnOK;
     private CsvSelect selectListener;
-
-    public CsvPickerPane(Container parent) {
-
-        initComponent();
-
-        setLayout(new BoxLayout(this,BoxLayout.Y_AXIS));
-        //setBorder(Constants.LINEBORDER);
-
-        Box baseBox = Box.createVerticalBox();
-
-        Box cmbBox = Box.createHorizontalBox();
-
-        cmbBox.add(cmbCSVFile);
-        cmbBox.add(Box.createHorizontalStrut(20));
-        cmbBox.add(btnBrowse);
-        cmbBox.add(Box.createHorizontalStrut(20));
-        cmbBox.add(btnOK);
-        cmbBox.add(Box.createHorizontalStrut(10));
-
-        baseBox.add(cmbBox);
-
-        add(baseBox);
-    }
-
-    private void initComponent(){
-        fileChooser = new JFileChooser(new File(System.getProperty("user.dir")));
-        fileChooserFilter = new TextFileFilter("CSV File (*.csv)",new String[]{"csv"});
-        fileChooser.setFileFilter(fileChooserFilter);
-        cmbCSVFileEle = new Vector<>();
-        cmbCSVFile = new  JComboBox<>(cmbCSVFileEle);
-        btnBrowse = new JButton("Browse");
-        btnBrowse.addActionListener(mActionListener);
-        btnOK = new JButton("OK");
-        btnOK.addActionListener(mActionListener);
-    }
-
-    public void setPickerEnabled(boolean b){
-        btnOK.setEnabled(b);
-    }
-
-    public void setFilter(CharSequence... searchCharSequences) {
-        fileChooserFilter = new TextFileFilter("CSV File (*.csv)",new String[]{"csv"},searchCharSequences);
-        fileChooser.setFileFilter(fileChooserFilter);
-    }
-
-    public void setSelectListener(CsvSelect listener) {
-        selectListener = listener;
-    }
-
     private ActionListener mActionListener = new ActionListener() {
 
         @Override
@@ -82,17 +34,17 @@ public class CsvPickerPane extends JPanel{
 
                         File csvFilePath;
 
-                        if(f.isDirectory()) {
+                        if (f.isDirectory()) {
                             csvFilePath = f;
-                        }else {
+                        } else {
                             csvFilePath = f.getParentFile();
                         }
 
                         cmbCSVFileEle.clear();
-                        cmbCSVFileEle.addAll(CsvFileWrapper.loadCSVFile(csvFilePath,fileChooserFilter.getFileNameFilter()));
+                        cmbCSVFileEle.addAll(CsvFileWrapper.loadCSVFile(csvFilePath, fileChooserFilter.getFileNameFilter()));
 
                         cmbCSVFile.setSelectedIndex(0);
-                        for(int i=0;i<cmbCSVFileEle.size();i++) {
+                        for (int i = 0; i < cmbCSVFileEle.size(); i++) {
                             CsvFileWrapper csvF = cmbCSVFileEle.get(i);
 
                             if (csvF.getFile().getPath().equals(f.getPath())) {
@@ -115,8 +67,27 @@ public class CsvPickerPane extends JPanel{
         }
     };
 
-    public interface CsvSelect{
-        void onSelected(File file);
+    public CsvPickerPane(Container parent) {
+
+        initComponent();
+
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        //setBorder(Constants.LINEBORDER);
+
+        Box baseBox = Box.createVerticalBox();
+
+        Box cmbBox = Box.createHorizontalBox();
+
+        cmbBox.add(cmbCSVFile);
+        cmbBox.add(Box.createHorizontalStrut(20));
+        cmbBox.add(btnBrowse);
+        cmbBox.add(Box.createHorizontalStrut(20));
+        cmbBox.add(btnOK);
+        cmbBox.add(Box.createHorizontalStrut(10));
+
+        baseBox.add(cmbBox);
+
+        add(baseBox);
     }
 
     private static void createAndShowGUI() {
@@ -133,6 +104,35 @@ public class CsvPickerPane extends JPanel{
 
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(() -> createAndShowGUI());
+    }
+
+    private void initComponent() {
+        fileChooser = new JFileChooser(new File(System.getProperty("user.dir")));
+        fileChooserFilter = new TextFileFilter("CSV File (*.csv)", new String[]{"csv"});
+        fileChooser.setFileFilter(fileChooserFilter);
+        cmbCSVFileEle = new Vector<>();
+        cmbCSVFile = new JComboBox<>(cmbCSVFileEle);
+        btnBrowse = new JButton("Browse");
+        btnBrowse.addActionListener(mActionListener);
+        btnOK = new JButton("OK");
+        btnOK.addActionListener(mActionListener);
+    }
+
+    public void setPickerEnabled(boolean b) {
+        btnOK.setEnabled(b);
+    }
+
+    public void setFilter(CharSequence... searchCharSequences) {
+        fileChooserFilter = new TextFileFilter("CSV File (*.csv)", new String[]{"csv"}, searchCharSequences);
+        fileChooser.setFileFilter(fileChooserFilter);
+    }
+
+    public void setSelectListener(CsvSelect listener) {
+        selectListener = listener;
+    }
+
+    public interface CsvSelect {
+        void onSelected(File file);
     }
 
 

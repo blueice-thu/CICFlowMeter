@@ -8,7 +8,10 @@ import javax.swing.*;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableColumn;
 import java.awt.*;
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.LineNumberReader;
 import java.util.Enumeration;
 
 /**
@@ -17,6 +20,7 @@ import java.util.Enumeration;
 public class SwingUtils {
     protected static final Logger logger = LoggerFactory.getLogger(SwingUtils.class);
     private final static String PCAP = "application/vnd.tcpdump.pcap";
+
     public static void fitTableColumns(JTable myTable) {
         JTableHeader header = myTable.getTableHeader();
         int rowCount = myTable.getRowCount();
@@ -39,7 +43,7 @@ public class SwingUtils {
         }
     }
 
-    public static void setBorderLayoutPane(Container container, Component comp, Object constraints){
+    public static void setBorderLayoutPane(Container container, Component comp, Object constraints) {
 
         if (container == null) {
             throw new IllegalArgumentException("BorderLayoutPane cannot be null!!");
@@ -48,17 +52,17 @@ public class SwingUtils {
         BorderLayout layout = (BorderLayout) container.getLayout();
         Component oldComp = layout.getLayoutComponent(constraints);
 
-        if(oldComp==null) {
-            if(comp!=null) {
-                container.add(comp,constraints);
+        if (oldComp == null) {
+            if (comp != null) {
+                container.add(comp, constraints);
             }
             container.repaint();
             container.revalidate();
-        }else {
-            if(comp!=oldComp) {
+        } else {
+            if (comp != oldComp) {
                 container.remove(oldComp);
-                if(comp!=null) {
-                    container.add(comp,constraints);
+                if (comp != null) {
+                    container.add(comp, constraints);
                 }
                 container.repaint();
                 container.revalidate();
@@ -84,7 +88,7 @@ public class SwingUtils {
 
             if (PCAP.equalsIgnoreCase(contentType)) {
                 return true;
-            }else{
+            } else {
                 return false;
             }
 
@@ -96,7 +100,7 @@ public class SwingUtils {
     }
 
     public static long countLines(String fileName) {
-        File file =new File(fileName);
+        File file = new File(fileName);
         int linenumber = 0;
         FileReader fr;
         LineNumberReader lnr = null;
@@ -104,7 +108,7 @@ public class SwingUtils {
             fr = new FileReader(file);
             lnr = new LineNumberReader(fr);
 
-            while (lnr.readLine() != null){
+            while (lnr.readLine() != null) {
                 linenumber++;
             }
 

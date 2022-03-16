@@ -33,31 +33,31 @@ public class InsertCsvRow implements Runnable {
 
         File fileSavPath = new File(savepath);
 
-        if(!fileSavPath.exists()) {
+        if (!fileSavPath.exists()) {
             fileSavPath.mkdirs();
         }
 
 
-        if(!savepath.endsWith(FILE_SEP)){
+        if (!savepath.endsWith(FILE_SEP)) {
             savepath += FILE_SEP;
         }
 
-        File file = new File(savepath+filename);
+        File file = new File(savepath + filename);
         FileOutputStream output = null;
 
         try {
             if (file.exists()) {
                 output = new FileOutputStream(file, true);
-            }else{
+            } else {
                 file.createNewFile();
                 output = new FileOutputStream(file);
 
                 if (header != null) {
-                    output.write((header+LINE_SEP).getBytes());
+                    output.write((header + LINE_SEP).getBytes());
                 }
             }
             for (String row : rows) {
-                output.write((row+LINE_SEP).getBytes());
+                output.write((row + LINE_SEP).getBytes());
             }
 
         } catch (FileNotFoundException e) {

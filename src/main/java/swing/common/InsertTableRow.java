@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 
-public class InsertTableRow implements Runnable  {
+public class InsertTableRow implements Runnable {
 
     private DefaultTableModel defaultTableModel;
     private List<String[]> rowList;
@@ -19,11 +19,11 @@ public class InsertTableRow implements Runnable  {
     @Override
     public void run() {
         //logger.info("insert table thead:{} name--{}",Thread.currentThread().getId(),Thread.currentThread().getName());
-        for(String[] row:rowList) {
+        for (String[] row : rowList) {
             defaultTableModel.insertRow(0, row);
         }
 
-        if(label!=null){
+        if (label != null) {
             label.setText(String.valueOf(defaultTableModel.getRowCount()));
         }
     }

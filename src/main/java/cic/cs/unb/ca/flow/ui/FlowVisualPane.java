@@ -24,7 +24,7 @@ import static cic.cs.unb.ca.jnetpcap.FlowFeature.*;
 /**
  * Created by yzhang29 on 03/01/18.
  */
-public class FlowVisualPane extends JDesktopPane implements CsvPickerPane.CsvSelect{
+public class FlowVisualPane extends JDesktopPane implements CsvPickerPane.CsvSelect {
     protected static final Logger logger = LoggerFactory.getLogger(FlowVisualPane.class);
 
     private CsvPickerPane pickerPane;
@@ -33,7 +33,7 @@ public class FlowVisualPane extends JDesktopPane implements CsvPickerPane.CsvSel
 
 
     private JTree graphTree;
-    private Multimap<FlowFileInfo,FlowChartInfo> treeNodeData;
+    private Multimap<FlowFileInfo, FlowChartInfo> treeNodeData;
 
     public FlowVisualPane() {
 
@@ -49,7 +49,7 @@ public class FlowVisualPane extends JDesktopPane implements CsvPickerPane.CsvSel
         flowChartPane = new FlowChartPane();
 
         add(pickerPane, BorderLayout.NORTH);
-        add(flowChartPane,BorderLayout.CENTER);
+        add(flowChartPane, BorderLayout.CENTER);
         add(initOptionPane(), BorderLayout.WEST);
     }
 
@@ -68,14 +68,14 @@ public class FlowVisualPane extends JDesktopPane implements CsvPickerPane.CsvSel
     }
 
     public void visualFile(File file) {
-        logger.info("visualFile {}",file.getPath());
+        logger.info("visualFile {}", file.getPath());
 
         if (isFlowFileInfoExist(file)) {
             return;
         } else {
             flowChartPane.removeChart();
             final CreateXMeansWorker xMeansWorker = new CreateXMeansWorker(file);
-            SwingUtils.setBorderLayoutPane(FlowVisualPane.this,progressBar,BorderLayout.SOUTH);
+            SwingUtils.setBorderLayoutPane(FlowVisualPane.this, progressBar, BorderLayout.SOUTH);
             xMeansWorker.execute();
         }
     }
@@ -106,17 +106,17 @@ public class FlowVisualPane extends JDesktopPane implements CsvPickerPane.CsvSel
 
     private JPanel initGraphButtonPane() {
         JPanel pane = new JPanel();
-        pane.setLayout(new BoxLayout(pane,BoxLayout.Y_AXIS));
+        pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
 
         Box sizeBox = Box.createHorizontalBox();
         JLabel wlbl = new JLabel("Width: ");
         JSpinner widthSpinner;
         JSpinner heightSpinner;
         JLabel hlbl = new JLabel("Height: ");
-        SpinnerNumberModel  widthSpinnerModel;
-        SpinnerNumberModel  heightSpinnerModel;
-        widthSpinnerModel = new SpinnerNumberModel(300,ChartPanel.DEFAULT_MINIMUM_DRAW_WIDTH,ChartPanel.DEFAULT_MAXIMUM_DRAW_WIDTH,12);
-        heightSpinnerModel = new SpinnerNumberModel(200,ChartPanel.DEFAULT_MINIMUM_DRAW_HEIGHT,ChartPanel.DEFAULT_MAXIMUM_DRAW_HEIGHT,12);
+        SpinnerNumberModel widthSpinnerModel;
+        SpinnerNumberModel heightSpinnerModel;
+        widthSpinnerModel = new SpinnerNumberModel(300, ChartPanel.DEFAULT_MINIMUM_DRAW_WIDTH, ChartPanel.DEFAULT_MAXIMUM_DRAW_WIDTH, 12);
+        heightSpinnerModel = new SpinnerNumberModel(200, ChartPanel.DEFAULT_MINIMUM_DRAW_HEIGHT, ChartPanel.DEFAULT_MAXIMUM_DRAW_HEIGHT, 12);
         widthSpinner = new JSpinner(widthSpinnerModel);
         heightSpinner = new JSpinner(heightSpinnerModel);
         widthSpinner.setPreferredSize(heightSpinner.getPreferredSize());
@@ -203,14 +203,14 @@ public class FlowVisualPane extends JDesktopPane implements CsvPickerPane.CsvSel
         DefaultTreeModel model = (DefaultTreeModel) graphTree.getModel();
         DefaultMutableTreeNode root = (DefaultMutableTreeNode) model.getRoot();
 
-        DefaultMutableTreeNode fileInfoNode=null;
-        for(int i=0;i<root.getChildCount();i++) {
+        DefaultMutableTreeNode fileInfoNode = null;
+        for (int i = 0; i < root.getChildCount(); i++) {
             DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) root.getChildAt(i);
 
             FlowFileInfo fileInfoInNode = (FlowFileInfo) treeNode.getUserObject();
 
             if (fileInfoInNode == flowFileInfo) {
-                logger.debug("tree node -> {} exist",flowFileInfo.getFilepath().getPath());
+                logger.debug("tree node -> {} exist", flowFileInfo.getFilepath().getPath());
                 fileInfoNode = treeNode;
                 break;
             }
@@ -240,6 +240,78 @@ public class FlowVisualPane extends JDesktopPane implements CsvPickerPane.CsvSel
         }
         return false;
 
+    }
+
+    public void buildChart(FlowFileInfo info) {
+        logger.info("buildChart");
+
+        FlowChartWorkerFactory.BuildProtocolChartWorker protocol_worker = new FlowChartWorkerFactory.BuildProtocolChartWorker(info, FlowChartWorkerFactory.PIE_CHART);
+        protocol_worker.addPropertyChangeListener(event -> {
+            //logger.info("build Protocol chart");
+            ChartWorkerPropertyChange(event, protocol_worker);
+        });
+        protocol_worker.execute();
+
+        FlowChartWorkerFactory.BuildIPChartWorker sip_worker = new FlowChartWorkerFactory.BuildIPChartWorker(info, src_ip, FlowChartWorkerFactory.BAR_CHART);
+        sip_worker.addPropertyChangeListener(event -> {
+            //logger.info("build src ip chart");
+            ChartWorkerPropertyChange(event, sip_worker);
+        });
+        sip_worker.execute();
+
+        FlowChartWorkerFactory.BuildIPChartWorker dip_worker = new FlowChartWorkerFactory.BuildIPChartWorker(info, dst_ip, FlowChartWorkerFactory.BAR_CHART);
+        dip_worker.addPropertyChangeListener(event -> {
+            //logger.info("build dst ip chart");
+            ChartWorkerPropertyChange(event, dip_worker);
+        });
+        dip_worker.execute();
+
+        FlowChartWorkerFactory.BuildPortChartWorker spt_worker = new FlowChartWorkerFactory.BuildPortChartWorker(info, src_port, FlowChartWorkerFactory.BAR_CHART);
+        spt_worker.addPropertyChangeListener(event -> {
+            //logger.info("build src port chart");
+            ChartWorkerPropertyChange(event, spt_worker);
+        });
+        spt_worker.execute();
+
+        FlowChartWorkerFactory.BuildPortChartWorker dpt_worker = new FlowChartWorkerFactory.BuildPortChartWorker(info, dst_pot, FlowChartWorkerFactory.BAR_CHART);
+        dpt_worker.addPropertyChangeListener(event -> {
+            //logger.info("build dst port chart");
+            ChartWorkerPropertyChange(event, dpt_worker);
+        });
+        dpt_worker.execute();
+    }
+
+    private void ChartWorkerPropertyChange(PropertyChangeEvent event, FlowChartWorkerFactory.FlowChartSwingWorker<JFreeChart, String> task) {
+
+        if ("state".equalsIgnoreCase(event.getPropertyName())) {
+
+            SwingWorker.StateValue sv = (SwingWorker.StateValue) event.getNewValue();
+
+            switch (sv) {
+                case STARTED:
+                    SwingUtils.setBorderLayoutPane(FlowVisualPane.this, progressBar, BorderLayout.SOUTH);
+                    break;
+                case DONE:
+                    try {
+                        JFreeChart chart = task.get();
+
+
+                        FlowFileInfo fileInfo = task.getFlowFileInfo();
+
+                        ChartContainer cc = new ChartContainer(chart);
+
+                        FlowChartInfo chartInfo = new FlowChartInfo(task.getChartTitle(), cc);
+
+                        flowChartPane.addChartContainer(cc);
+                        addChart2Tree(fileInfo, chartInfo);
+
+                        SwingUtils.setBorderLayoutPane(FlowVisualPane.this, null, BorderLayout.SOUTH);
+                    } catch (InterruptedException | ExecutionException e) {
+                        logger.debug(e.getMessage());
+                    }
+                    break;
+            }
+        }
     }
 
     private class CreateXMeansWorker extends SwingWorker<FlowFileInfo, String> {
@@ -272,81 +344,9 @@ public class FlowVisualPane extends JDesktopPane implements CsvPickerPane.CsvSel
             try {
                 FlowFileInfo flowFileInfo = get();
                 buildChart(flowFileInfo);
-                SwingUtils.setBorderLayoutPane(FlowVisualPane.this,null,BorderLayout.SOUTH);
+                SwingUtils.setBorderLayoutPane(FlowVisualPane.this, null, BorderLayout.SOUTH);
             } catch (InterruptedException | ExecutionException e) {
                 logger.debug(e.getMessage());
-            }
-        }
-    }
-
-    public void buildChart(FlowFileInfo info) {
-        logger.info("buildChart");
-
-        FlowChartWorkerFactory.BuildProtocolChartWorker protocol_worker = new FlowChartWorkerFactory.BuildProtocolChartWorker(info,FlowChartWorkerFactory.PIE_CHART);
-        protocol_worker.addPropertyChangeListener(event -> {
-            //logger.info("build Protocol chart");
-            ChartWorkerPropertyChange(event, protocol_worker);
-        });
-        protocol_worker.execute();
-
-        FlowChartWorkerFactory.BuildIPChartWorker sip_worker = new FlowChartWorkerFactory.BuildIPChartWorker(info,src_ip,FlowChartWorkerFactory.BAR_CHART);
-        sip_worker.addPropertyChangeListener(event -> {
-            //logger.info("build src ip chart");
-            ChartWorkerPropertyChange(event, sip_worker);
-        });
-        sip_worker.execute();
-
-        FlowChartWorkerFactory.BuildIPChartWorker dip_worker = new FlowChartWorkerFactory.BuildIPChartWorker(info,dst_ip,FlowChartWorkerFactory.BAR_CHART);
-        dip_worker.addPropertyChangeListener(event -> {
-            //logger.info("build dst ip chart");
-            ChartWorkerPropertyChange(event, dip_worker);
-        });
-        dip_worker.execute();
-
-        FlowChartWorkerFactory.BuildPortChartWorker spt_worker = new FlowChartWorkerFactory.BuildPortChartWorker(info, src_port, FlowChartWorkerFactory.BAR_CHART);
-        spt_worker.addPropertyChangeListener(event -> {
-            //logger.info("build src port chart");
-            ChartWorkerPropertyChange(event, spt_worker);
-        });
-        spt_worker.execute();
-
-        FlowChartWorkerFactory.BuildPortChartWorker dpt_worker = new FlowChartWorkerFactory.BuildPortChartWorker(info, dst_pot, FlowChartWorkerFactory.BAR_CHART);
-        dpt_worker.addPropertyChangeListener(event -> {
-            //logger.info("build dst port chart");
-            ChartWorkerPropertyChange(event, dpt_worker);
-        });
-        dpt_worker.execute();
-    }
-
-    private void ChartWorkerPropertyChange(PropertyChangeEvent event, FlowChartWorkerFactory.FlowChartSwingWorker<JFreeChart, String> task) {
-
-        if ("state".equalsIgnoreCase(event.getPropertyName())) {
-
-            SwingWorker.StateValue  sv = (SwingWorker.StateValue) event.getNewValue();
-
-            switch (sv) {
-                case STARTED:
-                    SwingUtils.setBorderLayoutPane(FlowVisualPane.this,progressBar,BorderLayout.SOUTH);
-                    break;
-                case DONE:
-                    try {
-                        JFreeChart chart = task.get();
-
-
-                        FlowFileInfo fileInfo = task.getFlowFileInfo();
-
-                        ChartContainer cc = new ChartContainer(chart);
-
-                        FlowChartInfo chartInfo = new FlowChartInfo(task.getChartTitle(),cc);
-
-                        flowChartPane.addChartContainer(cc);
-                        addChart2Tree(fileInfo, chartInfo);
-
-                        SwingUtils.setBorderLayoutPane(FlowVisualPane.this,null,BorderLayout.SOUTH);
-                    } catch (InterruptedException | ExecutionException e) {
-                        logger.debug(e.getMessage());
-                    }
-                    break;
             }
         }
     }

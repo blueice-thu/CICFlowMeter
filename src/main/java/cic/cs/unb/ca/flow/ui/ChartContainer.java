@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.awt.*;
 
-public class ChartContainer extends JPanel{
+public class ChartContainer extends JPanel {
     protected static final Logger logger = LoggerFactory.getLogger(ChartContainer.class);
 
     private static Dimension maxDim;
@@ -19,14 +19,8 @@ public class ChartContainer extends JPanel{
     private static Color boxDefaultColor;
     private static Color focusColor;
 
-    Box parentBox;
-    Box chartBox;
-
-    ChartPanel chartPane;
-
-
-    static{
-        maxDim = new Dimension(ChartPanel.DEFAULT_MAXIMUM_DRAW_WIDTH*4, ChartPanel.DEFAULT_MAXIMUM_DRAW_HEIGHT*4);
+    static {
+        maxDim = new Dimension(ChartPanel.DEFAULT_MAXIMUM_DRAW_WIDTH * 4, ChartPanel.DEFAULT_MAXIMUM_DRAW_HEIGHT * 4);
         minDim = new Dimension(ChartPanel.DEFAULT_MINIMUM_DRAW_WIDTH, ChartPanel.DEFAULT_MINIMUM_DRAW_HEIGHT);
         zoomPercentage = 0.1;
 
@@ -35,9 +29,13 @@ public class ChartContainer extends JPanel{
 
     }
 
+    Box parentBox;
+    Box chartBox;
+    ChartPanel chartPane;
+
 
     public ChartContainer(JFreeChart chart) {
-        setLayout(new BorderLayout(0,0));
+        setLayout(new BorderLayout(0, 0));
 
         chartPane = new ChartPanel(chart);
 
@@ -78,7 +76,7 @@ public class ChartContainer extends JPanel{
     private JPanel init_btnPane(ChartPanel chart) {
         JPanel pane = new JPanel();
 
-        pane.setLayout(new BoxLayout(pane,BoxLayout.Y_AXIS));
+        pane.setLayout(new BoxLayout(pane, BoxLayout.Y_AXIS));
 
 
         JButton zoomIn = new JButton("Zoom In");
@@ -123,7 +121,7 @@ public class ChartContainer extends JPanel{
         Dimension d = chartBox.getSize();
 
         double w = d.width + d.width * zoomPercentage;
-        double h = (w * d.height)/d.width;
+        double h = (w * d.height) / d.width;
         d.setSize(w, h);
         d = clipDim(d);
 
@@ -141,7 +139,7 @@ public class ChartContainer extends JPanel{
         Dimension d = chartBox.getSize();
 
         double w = d.width - d.width * zoomPercentage;
-        double h = (w * d.height)/d.width;
+        double h = (w * d.height) / d.width;
         d.setSize(w, h);
 
         chartBox.setPreferredSize(d);

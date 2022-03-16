@@ -21,7 +21,7 @@
 		<dependency>
 			<groupId>org.jnetpcap</groupId>
 			<artifactId>jnetpcap</artifactId>
-			<version>1.4.1</version>
+			<version>1.4.1425</version>
 		</dependency>
 		
 		<dependency>

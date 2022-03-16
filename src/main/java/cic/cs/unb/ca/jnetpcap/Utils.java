@@ -1,19 +1,17 @@
 package cic.cs.unb.ca.jnetpcap;
 
 import org.apache.tika.Tika;
-import org.jnetpcap.PcapClosedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 
 public class Utils {
-    protected static final Logger logger = LoggerFactory.getLogger(Utils.class);
     public static final String FILE_SEP = System.getProperty("file.separator");
     public static final String LINE_SEP = System.lineSeparator();
-    private final static String PCAP = "application/vnd.tcpdump.pcap";
     public static final String FLOW_SUFFIX = "_Flow.csv";
-
+    protected static final Logger logger = LoggerFactory.getLogger(Utils.class);
+    private final static String PCAP = "application/vnd.tcpdump.pcap";
 
     private static boolean isPcapFile(String contentType) {
 
@@ -57,7 +55,7 @@ public class Utils {
     }
 
     public static long countLines(String fileName) {
-        File file =new File(fileName);
+        File file = new File(fileName);
         int linenumber = 0;
         FileReader fr;
         LineNumberReader lnr = null;
@@ -65,7 +63,7 @@ public class Utils {
             fr = new FileReader(file);
             lnr = new LineNumberReader(fr);
 
-            while (lnr.readLine() != null){
+            while (lnr.readLine() != null) {
                 linenumber++;
             }
 

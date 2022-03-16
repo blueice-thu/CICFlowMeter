@@ -16,7 +16,7 @@ public class GuavaMgr {
         return Instance;
     }
 
-    public void init(){
+    public void init() {
         mEventBus = new EventBus("CICFlowMeter");
     }
 
