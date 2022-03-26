@@ -23,13 +23,13 @@ public class ReadPcapFileWorker extends SwingWorker<List<String>, String> {
     public static final String PROPERTY_FLOW = "file_flow";
     private static final String DividingLine = "---------------------------------------------------------------------------------------------------------------";
 
-    private long flowTimeout;
-    private long activityTimeout;
-    private int totalFlows = 0;
+    private final long flowTimeout;
+    private final long activityTimeout;
+    private final int totalFlows = 0;
 
-    private File pcapPath;
+    private final File pcapPath;
     private String outPutDirectory;
-    private List<String> chunks;
+    private final List<String> chunks;
 
     public ReadPcapFileWorker(File inputFile, String outPutDir) {
         super();
@@ -202,7 +202,7 @@ public class ReadPcapFileWorker extends SwingWorker<List<String>, String> {
 
     class FlowListener implements FlowGenListener {
 
-        private String fileName;
+        private final String fileName;
 
         FlowListener(String fileName) {
             this.fileName = fileName;

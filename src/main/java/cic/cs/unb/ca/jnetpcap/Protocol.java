@@ -8,11 +8,11 @@ import org.jnetpcap.protocol.vpn.L2TP;
 
 public class Protocol {
 
-    private Tcp tcp;
-    private Udp udp;
-    private Ip4 ipv4;
-    private Ip6 ipv6;
-    private L2TP l2tp;
+    private final Tcp tcp;
+    private final Udp udp;
+    private final Ip4 ipv4;
+    private final Ip6 ipv6;
+    private final L2TP l2tp;
 
     public Protocol() {
         super();

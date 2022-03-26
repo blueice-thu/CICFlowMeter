@@ -13,8 +13,8 @@ import java.io.IOException;
 public class JTable2CSVWorker extends SwingWorker<String, String> {
     protected static final Logger logger = LoggerFactory.getLogger(JTable2CSVWorker.class);
 
-    private JTable table;
-    private File file;
+    private final JTable table;
+    private final File file;
 
     public JTable2CSVWorker(JTable table, File file) {
 
@@ -23,7 +23,7 @@ public class JTable2CSVWorker extends SwingWorker<String, String> {
         }
 
         if (file.isDirectory()) {
-            throw new IllegalArgumentException(file.toString() + " is NOT a file!!!");
+            throw new IllegalArgumentException(file + " is NOT a file!!!");
         }
 
         this.table = table;
@@ -52,7 +52,7 @@ public class JTable2CSVWorker extends SwingWorker<String, String> {
             tableHeader.deleteCharAt(tableHeader.length() - 1);
             //logger.info("header: {}", tableHeader.toString());
 
-            csv.write(tableHeader.toString() + Sys.LINE_SEP);
+            csv.write(tableHeader + Sys.LINE_SEP);
 
             StringBuilder tableRow;
             for (int i = 0; i < model.getRowCount(); i++) {
@@ -62,7 +62,7 @@ public class JTable2CSVWorker extends SwingWorker<String, String> {
                 }
                 tableRow.deleteCharAt(tableRow.length() - 1);
                 //logger.info("row: {}", tableRow.toString());
-                csv.write(tableRow.toString() + Sys.LINE_SEP);
+                csv.write(tableRow + Sys.LINE_SEP);
             }
 
         } catch (IOException e) {

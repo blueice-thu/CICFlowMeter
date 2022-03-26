@@ -86,11 +86,7 @@ public class SwingUtils {
 
             contentType = new Tika().detect(file);
 
-            if (PCAP.equalsIgnoreCase(contentType)) {
-                return true;
-            } else {
-                return false;
-            }
+            return PCAP.equalsIgnoreCase(contentType);
 
         } catch (IOException e) {
             logger.debug(e.getMessage());

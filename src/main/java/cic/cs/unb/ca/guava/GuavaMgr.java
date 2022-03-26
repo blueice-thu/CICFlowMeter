@@ -4,7 +4,7 @@ import com.google.common.eventbus.EventBus;
 
 public class GuavaMgr {
 
-    private static GuavaMgr Instance = new GuavaMgr();
+    private static final GuavaMgr Instance = new GuavaMgr();
 
     private EventBus mEventBus;
 

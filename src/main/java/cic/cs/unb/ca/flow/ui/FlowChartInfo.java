@@ -2,9 +2,9 @@ package cic.cs.unb.ca.flow.ui;
 
 public class FlowChartInfo {
 
-    private String name;
+    private final String name;
 
-    private ChartContainer cc;
+    private final ChartContainer cc;
 
 
     public FlowChartInfo(String name, ChartContainer cc) {

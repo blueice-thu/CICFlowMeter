@@ -11,7 +11,7 @@ import java.time.LocalDate;
 public class TextFileFilter extends FileFilter {
 
     private String description = "Text File include URL(*.txt,*.md)";
-    private String[] exts;
+    private final String[] exts;
     private CharSequence[] containStrs;
 
     public TextFileFilter(String description, String[] extensions, CharSequence... searchCharSequences) {
@@ -33,11 +33,7 @@ public class TextFileFilter extends FileFilter {
         String name = f.getName();
         String extension = FilenameUtils.getExtension(name);
 
-        if (StringUtils.equalsAnyIgnoreCase(extension, exts) && StringUtils.containsAny(name, containStrs)) {
-            return true;
-        }
-
-        return false;
+        return StringUtils.equalsAnyIgnoreCase(extension, exts) && StringUtils.containsAny(name, containStrs);
     }
 
     @Override
@@ -56,9 +52,7 @@ public class TextFileFilter extends FileFilter {
             String extension = FilenameUtils.getExtension(name);
 
             if (StringUtils.equalsAnyIgnoreCase(extension, exts) && StringUtils.containsAny(name, containStrs)) {
-                if (!StringUtils.contains(name, LocalDate.now().toString())) {
-                    return true;
-                }
+                return !StringUtils.contains(name, LocalDate.now().toString());
             }
 
             return false;

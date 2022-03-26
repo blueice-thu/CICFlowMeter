@@ -14,9 +14,9 @@ public class FlowChartPane extends JPanel {
     protected static final Logger logger = LoggerFactory.getLogger(FlowChartPane.class);
 
     private JPanel chartPane;
-    private List<ChartContainer> ccList = new ArrayList<>();
+    private final List<ChartContainer> ccList = new ArrayList<>();
     private ChartContainer focusCC = null;
-    private MouseAdapter mChartContainerMouseListener = new MouseAdapter() {
+    private final MouseAdapter mChartContainerMouseListener = new MouseAdapter() {
         @Override
         public void mouseClicked(MouseEvent mouseEvent) {
             super.mouseClicked(mouseEvent);

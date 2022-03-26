@@ -1,4 +1,6 @@
-.idea
-.build
-.gradle
-.logs
+.idea/
+build/
+.gradle/
+logs/
+data/
+jnetpcap/jnetpcap-javadoc-1.4.r1425-1

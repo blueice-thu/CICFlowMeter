@@ -15,8 +15,8 @@ import static cic.cs.unb.ca.jnetpcap.Utils.LINE_SEP;
 
 public class InsertCsvRow implements Runnable {
     public static final Logger logger = LoggerFactory.getLogger(InsertCsvRow.class);
-    private String header;
-    private List<String> rows;
+    private final String header;
+    private final List<String> rows;
     private String savepath = null;
     private String filename = null;
 

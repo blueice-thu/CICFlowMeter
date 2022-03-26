@@ -18,8 +18,8 @@ public class MainFrame extends JFrame {
 
     private static final long serialVersionUID = 7419600803861028585L;
 
-    private FlowOfflinePane offLinePane;
-    private FlowMonitorPane monitorPane;
+    private final FlowOfflinePane offLinePane;
+    private final FlowMonitorPane monitorPane;
     private FlowVisualPane visualPane;
 
 

@@ -4,7 +4,7 @@ import java.io.File;
 
 public class FlowVisualEvent {
 
-    private File csv_file;
+    private final File csv_file;
 
     public FlowVisualEvent(File csv_file) {
         this.csv_file = csv_file;

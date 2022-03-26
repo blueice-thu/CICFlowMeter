@@ -6,8 +6,8 @@ import java.io.File;
 
 public class FlowFileInfo {
 
-    private File filepath;
-    private WekaXMeans xMeans;
+    private final File filepath;
+    private final WekaXMeans xMeans;
 
     public FlowFileInfo(File filepath, WekaXMeans xMeans) {
         this.filepath = filepath;

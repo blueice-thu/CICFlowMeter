@@ -18,12 +18,12 @@ import java.util.Enumeration;
 public class WekaXMeans {
     protected static final Logger logger = LoggerFactory.getLogger(WekaXMeans.class);
 
-    private XMeans xmeans;
-    private XMeans dimenReduceXMeans;
-    private Instances orgDataSet;
-    private Instances dataSetWithoutStr;
+    private final XMeans xmeans;
+    private final XMeans dimenReduceXMeans;
+    private final Instances orgDataSet;
+    private final Instances dataSetWithoutStr;
     private Instances dimenReduceDataSet;
-    private SummaryStatistics[] summaryStatistics;
+    private final SummaryStatistics[] summaryStatistics;
 
 
     public WekaXMeans(Instances instances) {

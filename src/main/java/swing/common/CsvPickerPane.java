@@ -22,7 +22,7 @@ public class CsvPickerPane extends JPanel {
     private JButton btnBrowse;
     private JButton btnOK;
     private CsvSelect selectListener;
-    private ActionListener mActionListener = new ActionListener() {
+    private final ActionListener mActionListener = new ActionListener() {
 
         @Override
         public void actionPerformed(ActionEvent e) {

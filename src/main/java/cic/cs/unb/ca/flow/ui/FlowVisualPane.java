@@ -27,8 +27,8 @@ import static cic.cs.unb.ca.jnetpcap.FlowFeature.*;
 public class FlowVisualPane extends JDesktopPane implements CsvPickerPane.CsvSelect {
     protected static final Logger logger = LoggerFactory.getLogger(FlowVisualPane.class);
 
-    private CsvPickerPane pickerPane;
-    private FlowChartPane flowChartPane;
+    private final CsvPickerPane pickerPane;
+    private final FlowChartPane flowChartPane;
     private JProgressBar progressBar;
 
 

@@ -18,7 +18,7 @@ public class DateFormatter {
             Date tempDate = new Date(time);
             return simpleFormatter.format(tempDate);
         } catch (Exception ex) {
-            System.out.println(ex.toString());
+            System.out.println(ex);
             return "dd/MM/yyyy hh:mm:ss";
         }
     }

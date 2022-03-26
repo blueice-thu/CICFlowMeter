@@ -44,9 +44,9 @@ public class FlowGenerator {
     private HashMap<Integer, BasicFlow> finishedFlows;
     private HashMap<String, ArrayList> IPAddresses;
 
-    private boolean bidirectional;
-    private long flowTimeOut;
-    private long flowActivityTimeOut;
+    private final boolean bidirectional;
+    private final long flowTimeOut;
+    private final long flowActivityTimeOut;
     private int finishedFlowCount;
 
     public FlowGenerator(boolean bidirectional, long flowTimeout, long activityTimeout) {

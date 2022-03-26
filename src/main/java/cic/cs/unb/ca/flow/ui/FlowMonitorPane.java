@@ -373,7 +373,7 @@ public class FlowMonitorPane extends JPanel {
         //write flows to csv file
         String header = FlowFeature.getHeader();
         String path = FlowMgr.getInstance().getSavePath();
-        String filename = LocalDate.now().toString() + FlowMgr.FLOW_SUFFIX;
+        String filename = LocalDate.now() + FlowMgr.FLOW_SUFFIX;
         csvWriterThread.execute(new InsertCsvRow(header, flowStringList, path, filename));
 
         //insert flows to JTable

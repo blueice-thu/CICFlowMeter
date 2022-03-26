@@ -18,7 +18,7 @@ public class CsvFileWrapper {
     protected static final Logger logger = LoggerFactory.getLogger(CsvFileWrapper.class);
 
 
-    private File file;
+    private final File file;
 
     CsvFileWrapper(File file) {
         this.file = file;
@@ -38,7 +38,7 @@ public class CsvFileWrapper {
 
 
         File[] csvFiles = csvPath.listFiles((dir, name) ->
-                (name.toLowerCase().endsWith("csv") && !name.equals(LocalDate.now().toString() + "_online.csv"))
+                (name.toLowerCase().endsWith("csv") && !name.equals(LocalDate.now() + "_online.csv"))
         );
 
         if (csvFiles == null) {
@@ -69,11 +69,7 @@ public class CsvFileWrapper {
                 String name = pathname.getName();
                 String extension = FilenameUtils.getExtension(name);
 
-                if (StringUtils.equalsAnyIgnoreCase(extension, "csv") && !StringUtils.contains(name, LocalDate.now().toString())) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return StringUtils.equalsAnyIgnoreCase(extension, "csv") && !StringUtils.contains(name, LocalDate.now().toString());
             };
         }
 

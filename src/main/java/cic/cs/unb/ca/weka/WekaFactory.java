@@ -26,7 +26,7 @@ public class WekaFactory {
     public static final Attribute DRATTRX = new Attribute("X");
     public static final Attribute DRATTRY = new Attribute("Y");
     protected static final Logger logger = LoggerFactory.getLogger(WekaFactory.class);
-    private static WekaFactory instanceFactory = new WekaFactory();
+    private static final WekaFactory instanceFactory = new WekaFactory();
 
     public static WekaFactory getFactory() {
         return instanceFactory;

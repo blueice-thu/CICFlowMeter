@@ -24,8 +24,8 @@ public class PacketReader {
      * So far,The value of the field BasicPacketInfo.id is not used
      * It doesn't matter just using a static IdGenerator for realtime PcapPacket reading
      */
-    private static IdGenerator idGen = new IdGenerator();
-    private IdGenerator generator = new IdGenerator();
+    private static final IdGenerator idGen = new IdGenerator();
+    private final IdGenerator generator = new IdGenerator();
     private Pcap pcapReader;
     private long firstPacket;
     private long lastPacket;
@@ -36,8 +36,8 @@ public class PacketReader {
     private L2TP l2tp;
     private PcapHeader hdr;
     private JBuffer buf;
-    private boolean readIP6;
-    private boolean readIP4;
+    private final boolean readIP6;
+    private final boolean readIP4;
     private String file;
 
     public PacketReader(String filename) {
@@ -237,7 +237,7 @@ public class PacketReader {
         this.lastPacket = 0L;
 
         if (pcapReader == null) {
-            logger.error("Error while opening file for capture: " + errbuf.toString());
+            logger.error("Error while opening file for capture: " + errbuf);
             System.exit(-1);
         } else {
             this.tcp = new Tcp();

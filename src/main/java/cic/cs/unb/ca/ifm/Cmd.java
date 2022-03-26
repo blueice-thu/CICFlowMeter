@@ -20,7 +20,7 @@ public class Cmd {
 
     public static final Logger logger = LoggerFactory.getLogger(Cmd.class);
     private static final String DividingLine = "-------------------------------------------------------------------------------";
-    private static String[] animationChars = new String[]{"|", "/", "-", "\\"};
+    private static final String[] animationChars = new String[]{"|", "/", "-", "\\"};
 
     public static void main(String[] args) {
 
@@ -174,9 +174,9 @@ public class Cmd {
 
     static class FlowListener implements FlowGenListener {
 
-        private String fileName;
+        private final String fileName;
 
-        private String outPath;
+        private final String outPath;
 
         private long cnt;
 

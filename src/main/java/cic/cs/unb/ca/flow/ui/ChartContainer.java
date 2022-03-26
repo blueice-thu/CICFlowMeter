@@ -11,13 +11,13 @@ import java.awt.*;
 public class ChartContainer extends JPanel {
     protected static final Logger logger = LoggerFactory.getLogger(ChartContainer.class);
 
-    private static Dimension maxDim;
-    private static Dimension minDim;
+    private static final Dimension maxDim;
+    private static final Dimension minDim;
 
-    private static double zoomPercentage;
+    private static final double zoomPercentage;
 
-    private static Color boxDefaultColor;
-    private static Color focusColor;
+    private static final Color boxDefaultColor;
+    private static final Color focusColor;
 
     static {
         maxDim = new Dimension(ChartPanel.DEFAULT_MAXIMUM_DRAW_WIDTH * 4, ChartPanel.DEFAULT_MAXIMUM_DRAW_HEIGHT * 4);

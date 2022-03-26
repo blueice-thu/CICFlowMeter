@@ -17,7 +17,7 @@ public class TrafficFlowWorker extends SwingWorker<String, String> implements Fl
 
     public static final Logger logger = LoggerFactory.getLogger(TrafficFlowWorker.class);
     public static final String PROPERTY_FLOW = "flow";
-    private String device;
+    private final String device;
 
 
     public TrafficFlowWorker(String device) {
@@ -36,8 +36,8 @@ public class TrafficFlowWorker extends SwingWorker<String, String> implements Fl
         StringBuilder errbuf = new StringBuilder();
         Pcap pcap = Pcap.openLive(device, snaplen, promiscous, timeout, errbuf);
         if (pcap == null) {
-            logger.info("open {} fail -> {}", device, errbuf.toString());
-            return String.format("open %s fail ->", device) + errbuf.toString();
+            logger.info("open {} fail -> {}", device, errbuf);
+            return String.format("open %s fail ->", device) + errbuf;
         }
 
         PcapPacketHandler<String> jpacketHandler = (packet, user) -> {

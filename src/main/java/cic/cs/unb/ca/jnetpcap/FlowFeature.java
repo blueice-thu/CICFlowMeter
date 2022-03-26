@@ -99,9 +99,9 @@ public enum FlowFeature {
 
     protected static final Logger logger = LoggerFactory.getLogger(FlowFeature.class);
     private static String HEADER;
-    private String name;
-    private String abbr;
-    private boolean isNumeric;
+    private final String name;
+    private final String abbr;
+    private final boolean isNumeric;
     private String[] values;
 
     FlowFeature(String name, String abbr, boolean numeric) {

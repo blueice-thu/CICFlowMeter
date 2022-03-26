@@ -11,7 +11,7 @@ public class FlowMgr {
 
     public static final String FLOW_SUFFIX = "_Flow.csv";
     protected static final Logger logger = LoggerFactory.getLogger(FlowMgr.class);
-    private static FlowMgr Instance = new FlowMgr();
+    private static final FlowMgr Instance = new FlowMgr();
 
     private String mFlowSavePath;
     private String mDataPath;
@@ -50,7 +50,7 @@ public class FlowMgr {
     }
 
     public String getAutoSaveFile() {
-        String filename = LocalDate.now().toString() + FLOW_SUFFIX;
+        String filename = LocalDate.now() + FLOW_SUFFIX;
         return mFlowSavePath + filename;
     }
 }

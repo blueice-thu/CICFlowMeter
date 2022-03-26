@@ -58,7 +58,7 @@ public class BasicFlow {
     private long flowLastSeen;
     private long forwardLastSeen;
     private long backwardLastSeen;
-    private long activityTimeout;
+    private final long activityTimeout;
     private long sfLastPacketTS = -1;
     private int sfCount = 0;
     private long sfAcHelper = -1;
@@ -79,6 +79,7 @@ public class BasicFlow {
     private long bbulkStartHelper = 0;
     private long bbulkSizeHelper = 0;
     private long blastBulkTS = 0;
+
     public BasicFlow(boolean isBidirectional, BasicPacketInfo packet, byte[] flowSrc, byte[] flowDst, int flowSrcPort, int flowDstPort, long activityTimeout) {
         super();
         this.activityTimeout = activityTimeout;
@@ -90,6 +91,7 @@ public class BasicFlow {
         this.srcPort = flowSrcPort;
         this.dstPort = flowDstPort;
     }
+
     public BasicFlow(boolean isBidirectional, BasicPacketInfo packet, long activityTimeout) {
         super();
         this.activityTimeout = activityTimeout;
@@ -256,7 +258,7 @@ public class BasicFlow {
 
     public double getDownUpRatio() {
         if (this.forward.size() > 0) {
-            return (double) (this.backward.size() / this.forward.size());
+            return this.backward.size() / this.forward.size();
         }
         return 0;
     }

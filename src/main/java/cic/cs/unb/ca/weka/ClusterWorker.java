@@ -14,8 +14,8 @@ public class ClusterWorker extends SwingWorker<WekaXMeans, Integer> {
     public static final int FLOW_CSV = 1;
     public static final int URL_CSV = 2;
     protected static final Logger logger = LoggerFactory.getLogger(ClusterWorker.class);
-    private File csvfile;
-    private int csv_source;
+    private final File csvfile;
+    private final int csv_source;
 
     public ClusterWorker(File csvfile, int src) {
         this.csvfile = csvfile;

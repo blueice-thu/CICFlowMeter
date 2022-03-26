@@ -7,8 +7,8 @@ public class StatusBar extends JPanel {
 
     private static final long serialVersionUID = 4367500760345312984L;
 
-    private JLabel lblLeftText;
-    private JLabel lblRightTxt;
+    private final JLabel lblLeftText;
+    private final JLabel lblRightTxt;
 
     public StatusBar() {
         super();
