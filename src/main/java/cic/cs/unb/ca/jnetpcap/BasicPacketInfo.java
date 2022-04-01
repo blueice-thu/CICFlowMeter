@@ -34,6 +34,8 @@ public class BasicPacketInfo {
     private int icmpCode = -1;
     private int icmpType = -1;
 
+    private boolean isWrongFragment = false;
+
     public BasicPacketInfo(byte[] src, byte[] dst, int srcPort, int dstPort,
                            int protocol, long timeStamp, IdGenerator generator) {
         super();

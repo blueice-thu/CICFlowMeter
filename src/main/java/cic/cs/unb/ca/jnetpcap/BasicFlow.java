@@ -82,6 +82,8 @@ public class BasicFlow {
     private long bbulkSizeHelper = 0;
     private long blastBulkTS = 0;
 
+    private long wrongFragmentCount = 0;
+
     public BasicFlow(boolean isBidirectional, BasicPacketInfo packet, byte[] flowSrc, byte[] flowDst, int flowSrcPort, int flowDstPort, long activityTimeout) {
         super();
         this.activityTimeout = activityTimeout;
@@ -298,44 +300,31 @@ public class BasicFlow {
 
     public void checkFlags(BasicPacketInfo packet) {
         if (packet.hasFlagFIN()) {
-            //MutableInt count1 = flagCounts.get("FIN");
-            //count1.increment();
             flagCounts.get("FIN").increment();
         }
         if (packet.hasFlagSYN()) {
-            //MutableInt count2 = flagCounts.get("SYN");
-            //count2.increment();
             flagCounts.get("SYN").increment();
         }
         if (packet.hasFlagRST()) {
-            //MutableInt count3 = flagCounts.get("RST");
-            //count3.increment();
             flagCounts.get("RST").increment();
         }
         if (packet.hasFlagPSH()) {
-            //MutableInt count4 = flagCounts.get("PSH");
-            //count4.increment();
             flagCounts.get("PSH").increment();
         }
         if (packet.hasFlagACK()) {
-            //MutableInt count5 = flagCounts.get("ACK");
-            //count5.increment();
             flagCounts.get("ACK").increment();
         }
         if (packet.hasFlagURG()) {
-            //MutableInt count6 = flagCounts.get("URG");
-            //count6.increment();
             flagCounts.get("URG").increment();
         }
         if (packet.hasFlagCWR()) {
-            //MutableInt count7 = flagCounts.get("CWR");
-            //count7.increment();
             flagCounts.get("CWR").increment();
         }
         if (packet.hasFlagECE()) {
-            //MutableInt count8 = flagCounts.get("ECE");
-            //count8.increment();
             flagCounts.get("ECE").increment();
+        }
+        if (packet.isWrongFragment()) {
+            wrongFragmentCount++;
         }
     }
 
@@ -584,141 +573,6 @@ public class BasicFlow {
         if (!isFlagEnd && ((flowTimeOut - (this.endActiveTime - this.flowStartTime)) > 0)) {
             this.flowIdle.addValue(flowTimeOut - (this.endActiveTime - this.flowStartTime));
         }
-    }
-
-    public String dumpFlowBasedFeatures() {
-        String dump = "";
-        dump += this.flowId + ",";
-        dump += FormatUtils.ip(src) + ",";
-        dump += getSrcPort() + ",";
-        dump += FormatUtils.ip(dst) + ",";
-        dump += getDstPort() + ",";
-        dump += getProtocol() + ",";
-        //dump+=this.flowStartTime+",";
-        dump += DateFormatter.parseDateFromLong(this.flowStartTime / 1000L, "yyyy-MM-dd HH:mm:ss") + ",";
-        long flowDuration = this.flowLastSeen - this.flowStartTime;
-        dump += flowDuration + ",";
-        dump += this.fwdPktStats.getN() + ",";
-        dump += this.bwdPktStats.getN() + ",";
-        dump += this.fwdPktStats.getSum() + ",";
-        dump += this.bwdPktStats.getSum() + ",";
-        if (fwdPktStats.getN() > 0L) {
-            dump += this.fwdPktStats.getMax() + ",";
-            dump += this.fwdPktStats.getMin() + ",";
-            dump += this.fwdPktStats.getMean() + ",";
-            dump += this.fwdPktStats.getStandardDeviation() + ",";
-        } else {
-            dump += "0,0,0,0,";
-        }
-        if (bwdPktStats.getN() > 0L) {
-            dump += this.bwdPktStats.getMax() + ",";
-            dump += this.bwdPktStats.getMin() + ",";
-            dump += this.bwdPktStats.getMean() + ",";
-            dump += this.bwdPktStats.getStandardDeviation() + ",";
-        } else {
-            dump += "0,0,0,0,";
-        }
-        // flow duration is in microseconds, therefore packets per seconds = packets / (duration/1000000)
-        dump += ((double) (this.forwardBytes + this.backwardBytes)) / ((double) flowDuration / 1000000L) + ",";
-        dump += ((double) packetCount()) / ((double) flowDuration / 1000000L) + ",";
-        dump += this.flowIAT.getMean() + ",";
-        dump += this.flowIAT.getStandardDeviation() + ",";
-        dump += this.flowIAT.getMax() + ",";
-        dump += this.flowIAT.getMin() + ",";
-        if (this.forward.size() > 1) {
-            dump += this.forwardIAT.getSum() + ",";
-            dump += this.forwardIAT.getMean() + ",";
-            dump += this.forwardIAT.getStandardDeviation() + ",";
-            dump += this.forwardIAT.getMax() + ",";
-            dump += this.forwardIAT.getMin() + ",";
-        } else {
-            dump += "0,0,0,0,0,";
-        }
-        if (this.backward.size() > 1) {
-            dump += this.backwardIAT.getSum() + ",";
-            dump += this.backwardIAT.getMean() + ",";
-            dump += this.backwardIAT.getStandardDeviation() + ",";
-            dump += this.backwardIAT.getMax() + ",";
-            dump += this.backwardIAT.getMin() + ",";
-        } else {
-            dump += "0,0,0,0,0,";
-        }
-
-        dump += this.fPSH_cnt + ",";
-        dump += this.bPSH_cnt + ",";
-        dump += this.fURG_cnt + ",";
-        dump += this.bURG_cnt + ",";
-
-        dump += this.fHeaderBytes + ",";
-        dump += this.bHeaderBytes + ",";
-        dump += getfPktsPerSecond() + ",";
-        dump += getbPktsPerSecond() + ",";
-
-        if (this.forward.size() > 0 || this.backward.size() > 0) {
-            dump += this.flowLengthStats.getMin() + ",";
-            dump += this.flowLengthStats.getMax() + ",";
-            dump += this.flowLengthStats.getMean() + ",";
-            dump += this.flowLengthStats.getStandardDeviation() + ",";
-            dump += flowLengthStats.getVariance() + ",";
-        } else {
-            dump += "0,0,0,0,";
-        }
-
-        for (String key : flagCounts.keySet()) {
-            dump += flagCounts.get(key).value + ",";
-        }
-
-        dump += getDownUpRatio() + ",";
-        dump += getAvgPacketSize() + ",";
-        dump += fAvgSegmentSize() + ",";
-        dump += bAvgSegmentSize() + ",";
-        dump += this.fHeaderBytes + ",";  //this feature is duplicated
-
-
-        dump += fAvgBytesPerBulk() + ",";
-        dump += fAvgPacketsPerBulk() + ",";
-        dump += fAvgBulkRate() + ",";
-        dump += bAvgBytesPerBulk() + ",";
-        dump += bAvgPacketsPerBulk() + ",";
-        dump += bAvgBulkRate() + ",";
-
-        dump += getSflow_fpackets() + ",";
-        dump += getSflow_fbytes() + ",";
-        dump += getSflow_bpackets() + ",";
-        dump += getSflow_bbytes() + ",";
-
-        dump += this.Init_Win_bytes_forward + ",";
-        dump += this.Init_Win_bytes_backward + ",";
-        dump += this.Act_data_pkt_forward + ",";
-        dump += this.min_seg_size_forward + ",";
-
-        if (this.flowActive.getN() > 0) {
-            dump += this.flowActive.getMean() + ",";
-            dump += this.flowActive.getStandardDeviation() + ",";
-            dump += this.flowActive.getMax() + ",";
-            dump += this.flowActive.getMin() + ",";
-        } else {
-            dump += "0,0,0,0,";
-        }
-
-        if (this.flowIdle.getN() > 0) {
-            dump += this.flowIdle.getMean() + ",";
-            dump += this.flowIdle.getStandardDeviation() + ",";
-            dump += this.flowIdle.getMax() + ",";
-            dump += this.flowIdle.getMin();
-        } else {
-            dump += "0,0,0,0";
-        }
-        dump += "," + getLabel();
-
-		/*if(FormatUtils.ip(src).equals("147.32.84.165") | FormatUtils.ip(dst).equals("147.32.84.165")){
-			dump+=",BOTNET";
-		}
-		else{
-			dump+=",BENIGN";
-		} */
-        /////////////////////////////////
-        return dump;
     }
 
     public int packetCount() {
@@ -1258,6 +1112,7 @@ public class BasicFlow {
 
         dump.append(getLand()).append(separator); // land
         dump.append(getService()).append(separator); // service
+        dump.append(wrongFragmentCount).append(separator); // wrong_fragment
 
         dump.append(getLabel());
 

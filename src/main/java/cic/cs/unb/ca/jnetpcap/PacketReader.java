@@ -174,6 +174,8 @@ public class PacketReader {
                 packetInfo = new BasicPacketInfo(idGen);
                 packetInfo.setSrc(protocol.getIpv4().source());
                 packetInfo.setDst(protocol.getIpv4().destination());
+                packetInfo.setWrongFragment(!protocol.getIpv4().isChecksumValid());
+
                 //packetInfo.setTimeStamp(packet.getCaptureHeader().timestampInMillis());
                 packetInfo.setTimeStamp(packet.getCaptureHeader().timestampInMicros());
 
@@ -302,6 +304,8 @@ public class PacketReader {
                 packetInfo = new BasicPacketInfo(this.generator);
                 packetInfo.setSrc(this.ipv4.source());
                 packetInfo.setDst(this.ipv4.destination());
+                packetInfo.setWrongFragment(!ipv4.isChecksumValid());
+
                 //packetInfo.setTimeStamp(packet.getCaptureHeader().timestampInMillis());
                 packetInfo.setTimeStamp(packet.getCaptureHeader().timestampInMicros());
 

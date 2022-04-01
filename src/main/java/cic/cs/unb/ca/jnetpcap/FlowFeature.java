@@ -96,6 +96,7 @@ public enum FlowFeature {
 
     land("Land", "Land"),
     service("Service", "Service"),
+    wrong_frag("Wrong Fragment", "WrgFr"),
 
     Label("Label", "LBL", new String[]{"NeedManualLabel"});    //85
 
