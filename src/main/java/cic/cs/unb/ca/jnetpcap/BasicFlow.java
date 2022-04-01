@@ -16,6 +16,8 @@ public class BasicFlow {
     private List<BasicPacketInfo> forward = null;
     private List<BasicPacketInfo> backward = null;
 
+    private BasicPacketInfo firstPacket = null;
+
     private long forwardBytes;
     private long backwardBytes;
     private long fHeaderBytes;
@@ -142,6 +144,7 @@ public class BasicFlow {
         updateFlowBulk(packet);
         detectUpdateSubflows(packet);
         checkFlags(packet);
+        this.firstPacket = packet;
         this.flowStartTime = packet.getTimeStamp();
         this.flowLastSeen = packet.getTimeStamp();
         this.startActiveTime = packet.getTimeStamp();
@@ -746,6 +749,10 @@ public class BasicFlow {
         return isBidirectional;
     }
 
+    public BasicPacketInfo getFirstPacket() {
+        return firstPacket;
+    }
+
     public void setBidirectional(boolean isBidirectional) {
         this.isBidirectional = isBidirectional;
     }
@@ -792,10 +799,12 @@ public class BasicFlow {
 
     public String getProtocolStr() {
         switch (this.protocol) {
-            case (6):
+            case Protocol.TCP:
                 return "TCP";
-            case (17):
+            case Protocol.UDP:
                 return "UDP";
+            case Protocol.ICMP:
+                return "ICMP";
         }
         return "UNKNOWN";
     }
@@ -1071,6 +1080,16 @@ public class BasicFlow {
         return (flowIdle.getN() > 0) ? flowIdle.getMin() : 0;
     }
 
+    public int getLand() {
+        if (getProtocol() != Protocol.TCP && getProtocol() != Protocol.UDP) return 0;
+        return (getSrcIP().equals(getDstIP()) && getSrcPort() == getDstPort()) ? 1 : 0;
+    }
+
+    public int getService() {
+
+        return ServiceType.getService(this).ordinal();
+    }
+
     public String getLabel() {
         //the original is "|". I think it should be "||" need to check,
 		/*if(FormatUtils.ip(src).equals("147.32.84.165") || FormatUtils.ip(dst).equals("147.32.84.165")){
@@ -1080,6 +1099,12 @@ public class BasicFlow {
 			return "BENIGN";
 		}*/
         return "NeedManualLabel";
+    }
+
+    private void addZeros(StringBuilder dump, int n) {
+        for (int i = 0; i < n; i++) {
+            dump.append(0).append(separator);
+        }
     }
 
     public String dumpFlowBasedFeaturesEx() {
@@ -1109,10 +1134,7 @@ public class BasicFlow {
             dump.append(fwdPktStats.getMean()).append(separator);                    //15
             dump.append(fwdPktStats.getStandardDeviation()).append(separator);        //16
         } else {
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
+            addZeros(dump, 4);
         }
 
         if (bwdPktStats.getN() > 0L) {
@@ -1121,17 +1143,20 @@ public class BasicFlow {
             dump.append(bwdPktStats.getMean()).append(separator);                    //19
             dump.append(bwdPktStats.getStandardDeviation()).append(separator);        //20
         } else {
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
+            addZeros(dump, 4);
         }
-        dump.append(((double) (forwardBytes + backwardBytes)) / ((double) flowDuration / 1000000L)).append(separator);//21
-        dump.append(((double) packetCount()) / ((double) flowDuration / 1000000L)).append(separator);//22
-        dump.append(flowIAT.getMean()).append(separator);                            //23
-        dump.append(flowIAT.getStandardDeviation()).append(separator);                //24
-        dump.append(flowIAT.getMax()).append(separator);                            //25
-        dump.append(flowIAT.getMin()).append(separator);                            //26
+
+        if (this.forward.size() + this.backward.size() > 1) {
+            dump.append(((double) (forwardBytes + backwardBytes)) / ((double) flowDuration / 1000000L)).append(separator);//21
+            dump.append(((double) packetCount()) / ((double) flowDuration / 1000000L)).append(separator);//22
+            dump.append(flowIAT.getMean()).append(separator);                            //23
+            dump.append(flowIAT.getStandardDeviation()).append(separator);                //24
+            dump.append(flowIAT.getMax()).append(separator);                            //25
+            dump.append(flowIAT.getMin()).append(separator);                            //26
+        } else {
+            addZeros(dump, 6);
+        }
+
 
         if (this.forward.size() > 1) {
             dump.append(forwardIAT.getSum()).append(separator);                        //27
@@ -1139,14 +1164,10 @@ public class BasicFlow {
             dump.append(forwardIAT.getStandardDeviation()).append(separator);        //29
             dump.append(forwardIAT.getMax()).append(separator);                        //30
             dump.append(forwardIAT.getMin()).append(separator);                        //31
-
         } else {
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
+            addZeros(dump, 5);
         }
+
         if (this.backward.size() > 1) {
             dump.append(backwardIAT.getSum()).append(separator);                    //32
             dump.append(backwardIAT.getMean()).append(separator);                    //33
@@ -1154,11 +1175,7 @@ public class BasicFlow {
             dump.append(backwardIAT.getMax()).append(separator);                    //35
             dump.append(backwardIAT.getMin()).append(separator);                    //36
         } else {
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
+            addZeros(dump, 5);
         }
 
         dump.append(fPSH_cnt).append(separator);                                    //37
@@ -1179,11 +1196,7 @@ public class BasicFlow {
             dump.append(flowLengthStats.getStandardDeviation()).append(separator);    //48
             dump.append(flowLengthStats.getVariance()).append(separator);            //49
         } else {//seem to less one
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
+            addZeros(dump, 5);
         }
 		
 		/*for(MutableInt v:flagCounts.values()) {
@@ -1231,10 +1244,7 @@ public class BasicFlow {
             dump.append(flowActive.getMax()).append(separator);                        //79
             dump.append(flowActive.getMin()).append(separator);                        //80
         } else {
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
+            addZeros(dump, 4);
         }
 
         if (this.flowIdle.getN() > 0) {
@@ -1243,14 +1253,13 @@ public class BasicFlow {
             dump.append(flowIdle.getMax()).append(separator);                        //83
             dump.append(flowIdle.getMin()).append(separator);                        //84
         } else {
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
-            dump.append(0).append(separator);
+            addZeros(dump, 4);
         }
 
-        dump.append(getLabel());
+        dump.append(getLand()).append(separator); // land
+        dump.append(getService()).append(separator); // service
 
+        dump.append(getLabel());
 
         return dump.toString();
     }

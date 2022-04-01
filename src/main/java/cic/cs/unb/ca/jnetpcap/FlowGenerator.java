@@ -92,11 +92,7 @@ public class FlowGenerator {
             // 3.- we create a new flow with the packet-in-process
             if ((currentTimestamp - flow.getFlowStartTime()) > flowTimeOut) {
                 if (flow.packetCount() > 1) {
-                    if (mListener != null) {
-                        mListener.onFlowGenerated(flow);
-                    } else {
-                        finishedFlows.put(getFlowCount(), flow);
-                    }
+                    finishFlow(flow);
                     //flow.endActiveIdleTime(currentTimestamp,this.flowActivityTimeOut, this.flowTimeOut, false);
                 }
                 currentFlows.remove(id);
@@ -134,11 +130,7 @@ public class FlowGenerator {
                         if ((flow.getBwdFINFlags() + flow.getBwdFINFlags()) == 2) {
                             logger.debug("FlagFIN current has {} flow", currentFlows.size());
                             flow.addPacket(packet);
-                            if (mListener != null) {
-                                mListener.onFlowGenerated(flow);
-                            } else {
-                                finishedFlows.put(getFlowCount(), flow);
-                            }
+                            finishFlow(flow);
                             currentFlows.remove(id);
                             // Forward Flow Finished.
                         } else {
@@ -165,11 +157,7 @@ public class FlowGenerator {
                         if ((flow.getBwdFINFlags() + flow.getBwdFINFlags()) == 2) {
                             logger.debug("FlagFIN current has {} flow", currentFlows.size());
                             flow.addPacket(packet);
-                            if (mListener != null) {
-                                mListener.onFlowGenerated(flow);
-                            } else {
-                                finishedFlows.put(getFlowCount(), flow);
-                            }
+                            finishFlow(flow);
                             currentFlows.remove(id);
                             // Backward Flow Finished.
                         } else {
@@ -191,11 +179,7 @@ public class FlowGenerator {
             } else if (packet.hasFlagRST()) {
                 logger.debug("FlagRST current has {} flow", currentFlows.size());
                 flow.addPacket(packet);
-                if (mListener != null) {
-                    mListener.onFlowGenerated(flow);
-                } else {
-                    finishedFlows.put(getFlowCount(), flow);
-                }
+                finishFlow(flow);
                 currentFlows.remove(id);
             } else {
                 //
@@ -221,7 +205,20 @@ public class FlowGenerator {
                 }
             }
         } else {
-            currentFlows.put(packet.fwdFlowId(), new BasicFlow(bidirectional, packet, this.flowActivityTimeOut));
+            flow = new BasicFlow(bidirectional, packet, this.flowActivityTimeOut);
+            if (flow.getProtocol() == Protocol.ICMP) {
+                finishFlow(flow);
+            } else {
+                currentFlows.put(packet.fwdFlowId(), flow);
+            }
+        }
+    }
+
+    private void finishFlow(BasicFlow flow) {
+        if (mListener != null) {
+            mListener.onFlowGenerated(flow);
+        } else {
+            finishedFlows.put(getFlowCount(), flow);
         }
     }
 

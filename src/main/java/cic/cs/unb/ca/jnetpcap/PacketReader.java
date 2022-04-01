@@ -9,6 +9,7 @@ import org.jnetpcap.packet.JHeader;
 import org.jnetpcap.packet.JHeaderPool;
 import org.jnetpcap.packet.PcapPacket;
 import org.jnetpcap.protocol.lan.Ethernet;
+import org.jnetpcap.protocol.network.Icmp;
 import org.jnetpcap.protocol.network.Ip4;
 import org.jnetpcap.protocol.network.Ip6;
 import org.jnetpcap.protocol.tcpip.Tcp;
@@ -31,6 +32,7 @@ public class PacketReader {
     private long lastPacket;
     private Tcp tcp;
     private Udp udp;
+    private Icmp icmp;
     private Ip4 ipv4;
     private Ip6 ipv6;
     private L2TP l2tp;
@@ -183,7 +185,7 @@ public class PacketReader {
                     packetInfo.setTCPWindow(protocol.getTcp().window());
                     packetInfo.setSrcPort(protocol.getTcp().source());
                     packetInfo.setDstPort(protocol.getTcp().destination());
-                    packetInfo.setProtocol(6);
+                    packetInfo.setProtocol(Protocol.TCP);
                     packetInfo.setFlagFIN(protocol.getTcp().flags_FIN());
                     packetInfo.setFlagPSH(protocol.getTcp().flags_PSH());
                     packetInfo.setFlagURG(protocol.getTcp().flags_URG());
@@ -199,7 +201,13 @@ public class PacketReader {
                     packetInfo.setDstPort(protocol.getUdp().destination());
                     packetInfo.setPayloadBytes(protocol.getUdp().getPayloadLength());
                     packetInfo.setHeaderBytes(protocol.getUdp().getHeaderLength());
-                    packetInfo.setProtocol(17);
+                    packetInfo.setProtocol(Protocol.UDP);
+                } else if (packet.hasHeader(protocol.getIcmp())) {
+                    packetInfo.setProtocol(Protocol.ICMP);
+                    packetInfo.setSrcPort(Protocol.NO_PORT);
+                    packetInfo.setDstPort(Protocol.NO_PORT);
+                    packetInfo.setIcmpCode(protocol.getIcmp().code());
+                    packetInfo.setIcmpType(protocol.getIcmp().type());
                 } else {
                     int headerCount = packet.getHeaderCount();
                     for (int i = 0; i < headerCount; i++) {
@@ -322,6 +330,12 @@ public class PacketReader {
                     packetInfo.setPayloadBytes(udp.getPayloadLength());
                     packetInfo.setHeaderBytes(udp.getHeaderLength());
                     packetInfo.setProtocol(17);
+                } else if (packet.hasHeader(this.icmp)) {
+                    packetInfo.setProtocol(Protocol.ICMP);
+                    packetInfo.setSrcPort(Protocol.NO_PORT);
+                    packetInfo.setDstPort(Protocol.NO_PORT);
+                    packetInfo.setIcmpCode(this.icmp.code());
+                    packetInfo.setIcmpType(this.icmp.type());
                 } else {
 					/*logger.debug("other packet Ethernet -> {}"+  packet.hasHeader(new Ethernet()));
 					logger.debug("other packet Html     -> {}"+  packet.hasHeader(new Html()));

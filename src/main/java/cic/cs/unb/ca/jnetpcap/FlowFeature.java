@@ -94,6 +94,9 @@ public enum FlowFeature {
     idl_max("Idle Max", "IlMA"),                    //83
     idl_min("Idle Min", "IlMI"),                    //84
 
+    land("Land", "Land"),
+    service("Service", "Service"),
+
     Label("Label", "LBL", new String[]{"NeedManualLabel"});    //85
 
 
@@ -179,14 +182,18 @@ public enum FlowFeature {
             case prot:
                 try {
                     int number = NumberUtils.createNumber(value).intValue();
-                    if (number == 6) {
-                        ret = "TCP";
-
-                    } else if (number == 17) {
-                        ret = "UDP";
-
-                    } else {
-                        ret = "Others";
+                    switch (number) {
+                        case Protocol.TCP:
+                            ret = "TCP";
+                            break;
+                        case Protocol.UDP:
+                            ret = "UDP";
+                            break;
+                        case Protocol.ICMP:
+                            ret = "ICMP";
+                            break;
+                        default:
+                            ret = "Others";
                     }
                 } catch (NumberFormatException e) {
                     logger.info("NumberFormatException {} value is {}", e.getMessage(), value);
