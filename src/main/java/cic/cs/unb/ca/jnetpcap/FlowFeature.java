@@ -95,8 +95,9 @@ public enum FlowFeature {
     idl_min("Idle Min", "IlMI"),                    //84
 
     land("Land", "Land"),
-    service("Service", "Service"),
-    wrong_frag("Wrong Fragment", "WrgFr"),
+    service("Service", "Serv"),
+    wrong_frag("Wrong Fragment", "WrFr"),
+    flow_state("Flow State", "FlSt"),
 
     Label("Label", "LBL", new String[]{"NeedManualLabel"});    //85
 

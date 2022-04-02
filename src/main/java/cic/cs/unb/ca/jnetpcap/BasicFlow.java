@@ -83,6 +83,7 @@ public class BasicFlow {
     private long blastBulkTS = 0;
 
     private long wrongFragmentCount = 0;
+    private FlowState flowState = FlowState.INIT;
 
     public BasicFlow(boolean isBidirectional, BasicPacketInfo packet, byte[] flowSrc, byte[] flowDst, int flowSrcPort, int flowDstPort, long activityTimeout) {
         super();
@@ -102,14 +103,6 @@ public class BasicFlow {
         this.initParameters();
         this.isBidirectional = isBidirectional;
         this.firstPacket(packet);
-    }
-
-    public BasicFlow(BasicPacketInfo packet, long activityTimeout) {
-        super();
-        this.activityTimeout = activityTimeout;
-        this.initParameters();
-        this.isBidirectional = true;
-        firstPacket(packet);
     }
 
     public void initParameters() {
@@ -146,6 +139,7 @@ public class BasicFlow {
         updateFlowBulk(packet);
         detectUpdateSubflows(packet);
         checkFlags(packet);
+        updateFlowState(packet);
         this.firstPacket = packet;
         this.flowStartTime = packet.getTimeStamp();
         this.flowLastSeen = packet.getTimeStamp();
@@ -199,6 +193,7 @@ public class BasicFlow {
         updateFlowBulk(packet);
         detectUpdateSubflows(packet);
         checkFlags(packet);
+        updateFlowState(packet);
         long currentTimestamp = packet.getTimeStamp();
         if (isBidirectional) {
             this.flowLengthStats.addValue((double) packet.getPayloadBytes());
@@ -263,7 +258,7 @@ public class BasicFlow {
 
     public double getDownUpRatio() {
         if (this.forward.size() > 0) {
-            return this.backward.size() / this.forward.size();
+            return this.backward.size() * 1.0 / this.forward.size();
         }
         return 0;
     }
@@ -372,6 +367,153 @@ public class BasicFlow {
             updateBackwardBulk(packet, flastBulkTS);
         }
 
+    }
+
+    public void updateFlowState(BasicPacketInfo packet) {
+        if (this.protocol == Protocol.TCP) {
+            boolean isForward = Arrays.equals(this.src, packet.getSrc());
+            switch (this.flowState) {
+                case INIT:
+                    if (packet.hasFlagSYN() && packet.hasFlagACK())
+                        flowState = FlowState.S4;
+                    else if (packet.hasFlagSYN())
+                        flowState = FlowState.S1;
+                    else
+                        flowState = FlowState.OTH;
+                    break;
+
+                case S0:
+                    if (isForward) {
+                        if (packet.hasFlagRST())
+                            flowState = FlowState.RSTOS0;
+                        else if (packet.hasFlagFIN())
+                            flowState = FlowState.SH;
+                    }
+                    else { // from responder
+                        if (packet.hasFlagRST())
+                            flowState = FlowState.REJ;
+                        else if (packet.hasFlagSYN() && packet.hasFlagACK())
+                            flowState = FlowState.S1;
+                    }
+                    break;
+
+                case S4:
+                    if (isForward) {
+                        if (packet.hasFlagRST())
+                            flowState = FlowState.RSTRH;
+                        else if (packet.hasFlagFIN())
+                            flowState = FlowState.SHR;
+                    }
+                    break;
+
+                case S1:
+                    if (isForward) {
+                        if (packet.hasFlagRST())
+                            flowState = FlowState.RSTO;
+                        else if (packet.hasFlagACK())
+                            flowState = FlowState.ESTAB;
+                    }
+                    else { // responder
+                        if (packet.hasFlagRST())
+                            flowState = FlowState.RSTR;
+                    }
+                    break;
+
+                case ESTAB:
+                    if (isForward) {
+                        if (packet.hasFlagRST())
+                            flowState = FlowState.RSTO;
+                        else if (packet.hasFlagFIN())
+                            flowState = FlowState.S2;
+                    }
+                    else { // responder
+                        if (packet.hasFlagRST())
+                            flowState = FlowState.RSTR;
+                        else if (packet.hasFlagFIN())
+                            flowState = FlowState.S3;
+                    }
+                    break;
+
+                case S2:
+                    if (isForward) {
+                        if (packet.hasFlagRST())
+                            flowState = FlowState.RSTO;
+                    }
+                    else { // responder
+                        if (packet.hasFlagRST())
+                            flowState = FlowState.RSTR;
+                        else if (packet.hasFlagFIN())
+                            flowState = FlowState.S2F;
+                    }
+                    break;
+
+                case S3:
+                    if (isForward) {
+                        if (packet.hasFlagRST())
+                            flowState = FlowState.RSTO;
+                        else if (packet.hasFlagFIN())
+                            flowState = FlowState.S3F;
+                    }
+                    else { // responder
+                        if (packet.hasFlagRST())
+                            flowState = FlowState.RSTR;
+                    }
+                    break;
+
+                case S2F:
+                    if (isForward) {
+                        if (packet.hasFlagRST())
+                            flowState = FlowState.RSTO;
+                        else if (packet.hasFlagACK())
+                            flowState = FlowState.SF;
+                    }
+                    else { // responder
+                        if (packet.hasFlagRST())
+                            flowState = FlowState.RSTR;
+                    }
+                    break;
+
+                case S3F:
+                    if (isForward) {
+                        if (packet.hasFlagRST())
+                            flowState = FlowState.RSTO;
+                    }
+                    else { // responder
+                        if (packet.hasFlagRST())
+                            flowState = FlowState.RSTR;
+                        else if (packet.hasFlagACK())
+                            flowState = FlowState.SF;
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+        } else {
+            flowState = FlowState.SF;
+        }
+    }
+
+    public int getFlowState() {
+        FlowState state = flowState;
+        switch (state) {
+            case ESTAB:
+                state = FlowState.S1;
+            break;
+
+            case S4:
+                state = FlowState.OTH;
+            break;
+
+            case S2F:
+                state = FlowState.S2;
+            break;
+
+            case S3F:
+                state = FlowState.S3;
+            break;
+        }
+        return state.ordinal();
     }
 
     public void updateForwardBulk(BasicPacketInfo packet, long tsOflastBulkInOther) {
@@ -1113,6 +1255,7 @@ public class BasicFlow {
         dump.append(getLand()).append(separator); // land
         dump.append(getService()).append(separator); // service
         dump.append(wrongFragmentCount).append(separator); // wrong_fragment
+        dump.append(getFlowState()).append(separator); // wrong_fragment
 
         dump.append(getLabel());
 
