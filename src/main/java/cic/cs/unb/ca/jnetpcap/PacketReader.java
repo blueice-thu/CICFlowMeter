@@ -252,6 +252,7 @@ public class PacketReader {
         } else {
             this.tcp = new Tcp();
             this.udp = new Udp();
+            this.icmp = new Icmp();
             this.ipv4 = new Ip4();
             this.ipv6 = new Ip6();
             this.l2tp = new L2TP();
