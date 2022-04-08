@@ -91,12 +91,12 @@ public class FlowGenerator {
             // 2.- we eliminate the flow from the current flow list
             // 3.- we create a new flow with the packet-in-process
             if ((currentTimestamp - flow.getFlowStartTime()) > flowTimeOut) {
-                if (flow.packetCount() > 1) {
+                if (flow.getPacketCount() > 1) {
                     finishFlow(flow);
                     //flow.endActiveIdleTime(currentTimestamp,this.flowActivityTimeOut, this.flowTimeOut, false);
                 }
                 currentFlows.remove(id);
-                currentFlows.put(id, new BasicFlow(bidirectional, packet, flow.getSrc(), flow.getDst(), flow.getSrcPort(), flow.getDstPort(), this.flowActivityTimeOut));
+                currentFlows.put(id, new BasicFlow(bidirectional, packet, this.flowActivityTimeOut));
 
                 int cfsize = currentFlows.size();
                 if (cfsize % 50 == 0) {
@@ -264,7 +264,7 @@ public class FlowGenerator {
             Set<Integer> fkeys = finishedFlows.keySet();
             for (Integer key : fkeys) {
                 flow = finishedFlows.get(key);
-                if (flow.packetCount() > 1) {
+                if (flow.getPacketCount() > 1) {
                     output.write((flow.dumpFlowBasedFeaturesEx() + "\n").getBytes());
                     total++;
                 } else {
@@ -277,7 +277,7 @@ public class FlowGenerator {
             output.write((header + "\n").getBytes());
             for (String key : ckeys) {
                 flow = currentFlows.get(key);
-                if (flow.packetCount() > 1) {
+                if (flow.getPacketCount() > 1) {
                     output.write((flow.dumpFlowBasedFeaturesEx() + "\n").getBytes());
                     total++;
                 } else {
@@ -316,7 +316,7 @@ public class FlowGenerator {
             }
 
             for (BasicFlow flow : currentFlows.values()) {
-                if (flow.packetCount() > 1) {
+                if (flow.getPacketCount() > 1) {
                     output.write((flow.dumpFlowBasedFeaturesEx() + LINE_SEP).getBytes());
                     total++;
                 } else {

@@ -68,7 +68,7 @@ public enum FlowFeature {
     CWR_cnt("CWR Flag Count", "CWRCT"),                //56
     ece_cnt("ECE Flag Count", "ECECT"),                //57
     down_up_ratio("Down/Up Ratio", "D/URO"),            //58
-    pkt_size_avg("Average Packet Size", "PSAG"),            //59
+//    pkt_size_avg("Average Packet Size", "PSAG"),            //59
     fw_seg_avg("Fwd Segment Size Avg", "FwSgAG"),        //60
     bw_seg_avg("Bwd Segment Size Avg", "BwSgAG"),        //61
     fw_byt_blk_avg("Fwd Bytes/Bulk Avg", "FwB/BAG"),        //63   62 is duplicated with 41,so has been deleted
@@ -158,22 +158,6 @@ public enum FlowFeature {
         for (int i = fl_dur.ordinal(); i <= idl_min.ordinal(); i++) {
             features.add(FlowFeature.values()[i]);
         }
-        return features;
-    }
-
-    public static List<FlowFeature> getLengthFeature() {
-        List<FlowFeature> features = new ArrayList<>();
-        features.add(tot_l_fw_pkt);
-        features.add(tot_l_bw_pkt);
-        features.add(fl_byt_s);
-        features.add(fl_pkt_s);
-        features.add(fw_hdr_len);
-        features.add(bw_hdr_len);
-        features.add(fw_pkt_s);
-        features.add(bw_pkt_s);
-        features.add(pkt_size_avg);
-        features.add(fw_seg_avg);
-        features.add(bw_seg_avg);
         return features;
     }
 

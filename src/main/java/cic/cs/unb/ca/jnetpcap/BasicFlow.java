@@ -11,182 +11,110 @@ import java.util.List;
 public class BasicFlow {
 
     private final static String separator = ",";
-    private SummaryStatistics fwdPktStats = null;
-    private SummaryStatistics bwdPktStats = null;
-    private List<BasicPacketInfo> forward = null;
-    private List<BasicPacketInfo> backward = null;
+    private final long UNINITIALIZED = 0L;
+    private final SummaryStatistics fwdPktStats = new SummaryStatistics();
+    private final SummaryStatistics bwdPktStats = new SummaryStatistics();
+    private List<BasicPacketInfo> forward = new ArrayList<>();
+    private List<BasicPacketInfo> backward = new ArrayList<>();
 
     private BasicPacketInfo firstPacket = null;
 
-    private long forwardBytes;
-    private long backwardBytes;
-    private long fHeaderBytes;
-    private long bHeaderBytes;
+    private long fwdBytes = 0L;
+    private long bwdBytes = 0L;
+    private long fwdHeaderBytes = 0L;
+    private long bwdHeaderBytes = 0L;
 
     private boolean isBidirectional;
 
-    private HashMap<String, MutableInt> flagCounts;
+    private final HashMap<String, MutableInt> flagCounts = new HashMap<>();
 
-    private int fPSH_cnt;
-    private int bPSH_cnt;
-    private int fURG_cnt;
-    private int bURG_cnt;
-    private int fFIN_cnt;
-    private int bFIN_cnt;
+    private int fFIN_cnt = 0;
+    private int bFIN_cnt = 0;
 
-    private long Act_data_pkt_forward;
-    private long min_seg_size_forward;
-    private int Init_Win_bytes_forward = 0;
-    private int Init_Win_bytes_backward = 0;
+    private long fwdPacketsWithData = 0L;
+    private long minFwdSegmentSize = Long.MAX_VALUE;
+    private int fwdInitWindow = -1;
+    private int bwdInitWindow = -1;
+    private int fwdInitWinBytes = 0;
+    private int bwdInitWinBytes = 0;
 
-
-    private byte[] src;
-    private byte[] dst;
+    private byte[] src = null;
+    private byte[] dst = null;
     private int srcPort;
     private int dstPort;
     private int protocol;
+
     private long flowStartTime;
-    private long startActiveTime;
-    private long endActiveTime;
+    private long startActiveTime = 0L;
+    private long endActiveTime = 0L;
+
     private String flowId = null;
 
-    private SummaryStatistics flowIAT = null;
-    private SummaryStatistics forwardIAT = null;
-    private SummaryStatistics backwardIAT = null;
-    private SummaryStatistics flowLengthStats = null;
-    private SummaryStatistics flowActive = null;
-    private SummaryStatistics flowIdle = null;
+    private final SummaryStatistics flowIAT = new SummaryStatistics();
+    private final SummaryStatistics forwardIAT = new SummaryStatistics();
+    private final SummaryStatistics backwardIAT = new SummaryStatistics();
+    private final SummaryStatistics flowLengthStats = new SummaryStatistics();
+    private final SummaryStatistics flowActive = new SummaryStatistics();
+    private final SummaryStatistics flowIdle = new SummaryStatistics();
 
-    private long flowLastSeen;
-    private long forwardLastSeen;
-    private long backwardLastSeen;
+    private long flowLastSeenTime = UNINITIALIZED;
+    private long fwdLastSeenTime = UNINITIALIZED;
+    private long bwdLastSeenTime = UNINITIALIZED;
     private final long activityTimeout;
     private long sfLastPacketTS = -1;
     private int sfCount = 0;
     private long sfAcHelper = -1;
-    //////////////////////////////
-    private long fbulkDuration = 0;
-    private long fbulkPacketCount = 0;
-    private long fbulkSizeTotal = 0;
-    private long fbulkStateCount = 0;
-    private long fbulkPacketCountHelper = 0;
-    private long fbulkStartHelper = 0;
-    private long fbulkSizeHelper = 0;
-    private long flastBulkTS = 0;
-    private long bbulkDuration = 0;
-    private long bbulkPacketCount = 0;
-    private long bbulkSizeTotal = 0;
-    private long bbulkStateCount = 0;
-    private long bbulkPacketCountHelper = 0;
-    private long bbulkStartHelper = 0;
-    private long bbulkSizeHelper = 0;
-    private long blastBulkTS = 0;
+
+    private long fwdBulkDuration = 0;
+    private long fwdBulkPacketCount = 0;
+    private long fwdBulkSizeTotal = 0;
+    private long fwdBulkStateCount = 0;
+    private long fwdBulkPacketCountHelper = 0;
+    private long fwdBulkStartHelper = 0;
+    private long fwdBulkSizeHelper = 0;
+    private long fwdLastBulkTS = 0;
+    private long bwdBulkDuration = 0;
+    private long bwdBulkPacketCount = 0;
+    private long bwdBulkSizeTotal = 0;
+    private long bwdBulkStateCount = 0;
+    private long bwdBulkPacketCountHelper = 0;
+    private long bwdBulkStartHelper = 0;
+    private long bwdBulkSizeHelper = 0;
+    private long bwdLastBulkTS = 0;
 
     private long wrongFragmentCount = 0;
     private FlowState flowState = FlowState.INIT;
 
-    public BasicFlow(boolean isBidirectional, BasicPacketInfo packet, byte[] flowSrc, byte[] flowDst, int flowSrcPort, int flowDstPort, long activityTimeout) {
-        super();
-        this.activityTimeout = activityTimeout;
-        this.initParameters();
-        this.isBidirectional = isBidirectional;
-        this.firstPacket(packet);
-        this.src = flowSrc;
-        this.dst = flowDst;
-        this.srcPort = flowSrcPort;
-        this.dstPort = flowDstPort;
-    }
+    private final String[] flagKeys = new String[] {"FIN", "SYN", "RST", "PSH", "ACK", "URG", "CWR", "ECE", "PSH_FWD", "PSH_BWD", "UGR_FWD", "URG_BWD"};
 
     public BasicFlow(boolean isBidirectional, BasicPacketInfo packet, long activityTimeout) {
         super();
         this.activityTimeout = activityTimeout;
-        this.initParameters();
         this.isBidirectional = isBidirectional;
-        this.firstPacket(packet);
+        for (String flag: flagKeys) {
+            flagCounts.put(flag, new MutableInt());
+        }
+        initFlow(packet);
+        addPacket(packet);
     }
 
-    public void initParameters() {
-        this.forward = new ArrayList<BasicPacketInfo>();
-        this.backward = new ArrayList<BasicPacketInfo>();
-        this.flowIAT = new SummaryStatistics();
-        this.forwardIAT = new SummaryStatistics();
-        this.backwardIAT = new SummaryStatistics();
-        this.flowActive = new SummaryStatistics();
-        this.flowIdle = new SummaryStatistics();
-        this.flowLengthStats = new SummaryStatistics();
-        this.fwdPktStats = new SummaryStatistics();
-        this.bwdPktStats = new SummaryStatistics();
-        this.flagCounts = new HashMap<String, MutableInt>();
-        initFlags();
-        this.forwardBytes = 0L;
-        this.backwardBytes = 0L;
-        this.startActiveTime = 0L;
-        this.endActiveTime = 0L;
-        this.src = null;
-        this.dst = null;
-        this.fPSH_cnt = 0;
-        this.bPSH_cnt = 0;
-        this.fURG_cnt = 0;
-        this.bURG_cnt = 0;
-        this.fFIN_cnt = 0;
-        this.bFIN_cnt = 0;
-        this.fHeaderBytes = 0L;
-        this.bHeaderBytes = 0L;
-
+    private void initFlow(BasicPacketInfo packet) {
+        firstPacket = packet;
+        flowStartTime = packet.getTimeStamp();
+        flowLastSeenTime = packet.getTimeStamp();
+        startActiveTime = packet.getTimeStamp();
+        endActiveTime = packet.getTimeStamp();
+        src = packet.getSrc();
+        srcPort = packet.getSrcPort();
+        dst = packet.getDst();
+        dstPort = packet.getDstPort();
+        protocol = packet.getProtocol();
+        flowId = packet.getFlowId();
+        fwdInitWindow = packet.getTCPWindow();
     }
 
-    public void firstPacket(BasicPacketInfo packet) {
-        updateFlowBulk(packet);
-        detectUpdateSubflows(packet);
-        checkFlags(packet);
-        updateFlowState(packet);
-        this.firstPacket = packet;
-        this.flowStartTime = packet.getTimeStamp();
-        this.flowLastSeen = packet.getTimeStamp();
-        this.startActiveTime = packet.getTimeStamp();
-        this.endActiveTime = packet.getTimeStamp();
-        this.flowLengthStats.addValue((double) packet.getPayloadBytes());
-
-        if (this.src == null) {
-            this.src = packet.getSrc();
-            this.srcPort = packet.getSrcPort();
-        }
-        if (this.dst == null) {
-            this.dst = packet.getDst();
-            this.dstPort = packet.getDstPort();
-        }
-        if (Arrays.equals(this.src, packet.getSrc())) {
-            this.min_seg_size_forward = packet.getHeaderBytes();
-            Init_Win_bytes_forward = packet.getTCPWindow();
-            this.flowLengthStats.addValue((double) packet.getPayloadBytes());
-            this.fwdPktStats.addValue((double) packet.getPayloadBytes());
-            this.fHeaderBytes = packet.getHeaderBytes();
-            this.forwardLastSeen = packet.getTimeStamp();
-            this.forwardBytes += packet.getPayloadBytes();
-            this.forward.add(packet);
-            if (packet.hasFlagPSH()) {
-                this.fPSH_cnt++;
-            }
-            if (packet.hasFlagURG()) {
-                this.fURG_cnt++;
-            }
-        } else {
-            Init_Win_bytes_backward = packet.getTCPWindow();
-            this.flowLengthStats.addValue((double) packet.getPayloadBytes());
-            this.bwdPktStats.addValue((double) packet.getPayloadBytes());
-            this.bHeaderBytes = packet.getHeaderBytes();
-            this.backwardLastSeen = packet.getTimeStamp();
-            this.backwardBytes += packet.getPayloadBytes();
-            this.backward.add(packet);
-            if (packet.hasFlagPSH()) {
-                this.bPSH_cnt++;
-            }
-            if (packet.hasFlagURG()) {
-                this.bURG_cnt++;
-            }
-        }
-        this.protocol = packet.getProtocol();
-        this.flowId = packet.getFlowId();
+    private boolean isForwardPacket(BasicPacketInfo packet) {
+        return Arrays.equals(this.src, packet.getSrc());
     }
 
     public void addPacket(BasicPacketInfo packet) {
@@ -194,54 +122,58 @@ public class BasicFlow {
         detectUpdateSubflows(packet);
         checkFlags(packet);
         updateFlowState(packet);
+
         long currentTimestamp = packet.getTimeStamp();
-        if (isBidirectional) {
-            this.flowLengthStats.addValue((double) packet.getPayloadBytes());
 
-            if (Arrays.equals(this.src, packet.getSrc())) {
-                if (packet.getPayloadBytes() >= 1) {
-                    this.Act_data_pkt_forward++;
-                }
-                this.fwdPktStats.addValue((double) packet.getPayloadBytes());
-                this.fHeaderBytes += packet.getHeaderBytes();
-                this.forward.add(packet);
-                this.forwardBytes += packet.getPayloadBytes();
-                if (this.forward.size() > 1)
-                    this.forwardIAT.addValue(currentTimestamp - this.forwardLastSeen);
-                this.forwardLastSeen = currentTimestamp;
-                this.min_seg_size_forward = Math.min(packet.getHeaderBytes(), this.min_seg_size_forward);
+        if (isForwardPacket(packet) || !this.isBidirectional) {
+            forward.add(packet);
+            fwdPktStats.addValue((double) packet.getPayloadBytes());
+            fwdHeaderBytes += packet.getHeaderBytes();
+            fwdBytes += packet.getPayloadBytes();
+            minFwdSegmentSize = Math.min(packet.getHeaderBytes(), minFwdSegmentSize);
 
-            } else {
-                this.bwdPktStats.addValue((double) packet.getPayloadBytes());
-                Init_Win_bytes_backward = packet.getTCPWindow();
-                this.bHeaderBytes += packet.getHeaderBytes();
-                this.backward.add(packet);
-                this.backwardBytes += packet.getPayloadBytes();
-                if (this.backward.size() > 1)
-                    this.backwardIAT.addValue(currentTimestamp - this.backwardLastSeen);
-                this.backwardLastSeen = currentTimestamp;
-            }
+            if (packet.getPayloadBytes() >= 1)
+                fwdPacketsWithData++;
+            if (packet.getTCPWindow() == fwdInitWindow)
+                fwdInitWinBytes += packet.getPayloadBytes();
+            else
+                fwdInitWindow = -2; // Should not be used forever
+
+            if (forward.size() > 1)
+                forwardIAT.addValue(currentTimestamp - fwdLastSeenTime);
+
+            fwdLastSeenTime = currentTimestamp;
         } else {
-            if (packet.getPayloadBytes() >= 1) {
-                this.Act_data_pkt_forward++;
+            if (bwdInitWindow == -1) { // First backward packet
+                bwdInitWindow = packet.getTCPWindow();
             }
-            this.fwdPktStats.addValue((double) packet.getPayloadBytes());
-            this.flowLengthStats.addValue((double) packet.getPayloadBytes());
-            this.fHeaderBytes += packet.getHeaderBytes();
-            this.forward.add(packet);
-            this.forwardBytes += packet.getPayloadBytes();
-            this.forwardIAT.addValue(currentTimestamp - this.forwardLastSeen);
-            this.forwardLastSeen = currentTimestamp;
-            this.min_seg_size_forward = Math.min(packet.getHeaderBytes(), this.min_seg_size_forward);
+            backward.add(packet);
+            bwdPktStats.addValue((double) packet.getPayloadBytes());
+            bwdInitWinBytes = packet.getTCPWindow();
+            bwdHeaderBytes += packet.getHeaderBytes();
+            bwdBytes += packet.getPayloadBytes();
+
+            if (bwdInitWindow == -1)
+                bwdInitWinBytes = packet.getTCPWindow();
+            if (packet.getTCPWindow() == bwdInitWindow)
+                bwdInitWinBytes += packet.getPayloadBytes();
+            else
+                bwdInitWindow = -2; // Should not be used forever
+
+            if (backward.size() > 1)
+                backwardIAT.addValue(currentTimestamp - bwdLastSeenTime);
+
+            bwdLastSeenTime = currentTimestamp;
         }
 
-        this.flowIAT.addValue(packet.getTimeStamp() - this.flowLastSeen);
-        this.flowLastSeen = packet.getTimeStamp();
-
+        if (getPacketCount() > 1)
+            flowIAT.addValue(packet.getTimeStamp() - flowLastSeenTime);
+        flowLengthStats.addValue((double) packet.getPayloadBytes());
+        flowLastSeenTime = packet.getTimeStamp();
     }
 
     public double getfPktsPerSecond() {
-        long duration = this.flowLastSeen - this.flowStartTime;
+        long duration = this.flowLastSeenTime - this.flowStartTime;
         if (duration > 0) {
             return (this.forward.size() / ((double) duration / 1000000L));
         } else
@@ -249,7 +181,7 @@ public class BasicFlow {
     }
 
     public double getbPktsPerSecond() {
-        long duration = this.flowLastSeen - this.flowStartTime;
+        long duration = this.flowLastSeenTime - this.flowStartTime;
         if (duration > 0) {
             return (this.backward.size() / ((double) duration / 1000000L));
         } else
@@ -259,13 +191,6 @@ public class BasicFlow {
     public double getDownUpRatio() {
         if (this.forward.size() > 0) {
             return this.backward.size() * 1.0 / this.forward.size();
-        }
-        return 0;
-    }
-
-    public double getAvgPacketSize() {
-        if (this.packetCount() > 0) {
-            return (this.flowLengthStats.getSum() / this.packetCount());
         }
         return 0;
     }
@@ -282,18 +207,8 @@ public class BasicFlow {
         return 0;
     }
 
-    public void initFlags() {
-        flagCounts.put("FIN", new MutableInt());
-        flagCounts.put("SYN", new MutableInt());
-        flagCounts.put("RST", new MutableInt());
-        flagCounts.put("PSH", new MutableInt());
-        flagCounts.put("ACK", new MutableInt());
-        flagCounts.put("URG", new MutableInt());
-        flagCounts.put("CWR", new MutableInt());
-        flagCounts.put("ECE", new MutableInt());
-    }
-
     public void checkFlags(BasicPacketInfo packet) {
+        boolean isForwardPacket = isForwardPacket(packet);
         if (packet.hasFlagFIN()) {
             flagCounts.get("FIN").increment();
         }
@@ -305,12 +220,20 @@ public class BasicFlow {
         }
         if (packet.hasFlagPSH()) {
             flagCounts.get("PSH").increment();
+            if (isForwardPacket)
+                flagCounts.get("PSH_FWD").increment();
+            else
+                flagCounts.get("PSH_BWD").increment();
         }
         if (packet.hasFlagACK()) {
             flagCounts.get("ACK").increment();
         }
         if (packet.hasFlagURG()) {
             flagCounts.get("URG").increment();
+            if (isForwardPacket)
+                flagCounts.get("UGR_FWD").increment();
+            else
+                flagCounts.get("URG_BWD").increment();
         }
         if (packet.hasFlagCWR()) {
             flagCounts.get("CWR").increment();
@@ -325,7 +248,7 @@ public class BasicFlow {
 
     public long getSflow_fbytes() {
         if (sfCount <= 0) return 0;
-        return this.forwardBytes / sfCount;
+        return this.fwdBytes / sfCount;
     }
 
     public long getSflow_fpackets() {
@@ -335,7 +258,7 @@ public class BasicFlow {
 
     public long getSflow_bbytes() {
         if (sfCount <= 0) return 0;
-        return this.backwardBytes / sfCount;
+        return this.bwdBytes / sfCount;
     }
 
     public long getSflow_bpackets() {
@@ -362,9 +285,9 @@ public class BasicFlow {
     public void updateFlowBulk(BasicPacketInfo packet) {
 
         if (this.src == packet.getSrc()) {
-            updateForwardBulk(packet, blastBulkTS);
+            updateForwardBulk(packet, bwdLastBulkTS);
         } else {
-            updateBackwardBulk(packet, flastBulkTS);
+            updateBackwardBulk(packet, fwdLastBulkTS);
         }
 
     }
@@ -519,41 +442,41 @@ public class BasicFlow {
     public void updateForwardBulk(BasicPacketInfo packet, long tsOflastBulkInOther) {
 
         long size = packet.getPayloadBytes();
-        if (tsOflastBulkInOther > fbulkStartHelper) fbulkStartHelper = 0;
+        if (tsOflastBulkInOther > fwdBulkStartHelper) fwdBulkStartHelper = 0;
         if (size <= 0) return;
 
         packet.getPayloadPacket();
 
-        if (fbulkStartHelper == 0) {
-            fbulkStartHelper = packet.getTimeStamp();
-            fbulkPacketCountHelper = 1;
-            fbulkSizeHelper = size;
-            flastBulkTS = packet.getTimeStamp();
+        if (fwdBulkStartHelper == 0) {
+            fwdBulkStartHelper = packet.getTimeStamp();
+            fwdBulkPacketCountHelper = 1;
+            fwdBulkSizeHelper = size;
+            fwdLastBulkTS = packet.getTimeStamp();
         } //possible bulk
         else {
             // Too much idle time?
-            if (((packet.getTimeStamp() - flastBulkTS) / (double) 1000000) > 1.0) {
-                fbulkStartHelper = packet.getTimeStamp();
-                flastBulkTS = packet.getTimeStamp();
-                fbulkPacketCountHelper = 1;
-                fbulkSizeHelper = size;
+            if (((packet.getTimeStamp() - fwdLastBulkTS) / (double) 1000000) > 1.0) {
+                fwdBulkStartHelper = packet.getTimeStamp();
+                fwdLastBulkTS = packet.getTimeStamp();
+                fwdBulkPacketCountHelper = 1;
+                fwdBulkSizeHelper = size;
             }// Add to bulk
             else {
-                fbulkPacketCountHelper += 1;
-                fbulkSizeHelper += size;
+                fwdBulkPacketCountHelper += 1;
+                fwdBulkSizeHelper += size;
                 //New bulk
-                if (fbulkPacketCountHelper == 4) {
-                    fbulkStateCount += 1;
-                    fbulkPacketCount += fbulkPacketCountHelper;
-                    fbulkSizeTotal += fbulkSizeHelper;
-                    fbulkDuration += packet.getTimeStamp() - fbulkStartHelper;
+                if (fwdBulkPacketCountHelper == 4) {
+                    fwdBulkStateCount += 1;
+                    fwdBulkPacketCount += fwdBulkPacketCountHelper;
+                    fwdBulkSizeTotal += fwdBulkSizeHelper;
+                    fwdBulkDuration += packet.getTimeStamp() - fwdBulkStartHelper;
                 } //Continuation of existing bulk
-                else if (fbulkPacketCountHelper > 4) {
-                    fbulkPacketCount += 1;
-                    fbulkSizeTotal += size;
-                    fbulkDuration += packet.getTimeStamp() - flastBulkTS;
+                else if (fwdBulkPacketCountHelper > 4) {
+                    fwdBulkPacketCount += 1;
+                    fwdBulkSizeTotal += size;
+                    fwdBulkDuration += packet.getTimeStamp() - fwdLastBulkTS;
                 }
-                flastBulkTS = packet.getTimeStamp();
+                fwdLastBulkTS = packet.getTimeStamp();
             }
         }
     }
@@ -563,64 +486,64 @@ public class BasicFlow {
 		bbulkSizeTotal=0;
 		bbulkStateCount=0;*/
         long size = packet.getPayloadBytes();
-        if (tsOflastBulkInOther > bbulkStartHelper) bbulkStartHelper = 0;
+        if (tsOflastBulkInOther > bwdBulkStartHelper) bwdBulkStartHelper = 0;
         if (size <= 0) return;
 
         packet.getPayloadPacket();
 
-        if (bbulkStartHelper == 0) {
-            bbulkStartHelper = packet.getTimeStamp();
-            bbulkPacketCountHelper = 1;
-            bbulkSizeHelper = size;
-            blastBulkTS = packet.getTimeStamp();
+        if (bwdBulkStartHelper == 0) {
+            bwdBulkStartHelper = packet.getTimeStamp();
+            bwdBulkPacketCountHelper = 1;
+            bwdBulkSizeHelper = size;
+            bwdLastBulkTS = packet.getTimeStamp();
         } //possible bulk
         else {
             // Too much idle time?
-            if (((packet.getTimeStamp() - blastBulkTS) / (double) 1000000) > 1.0) {
-                bbulkStartHelper = packet.getTimeStamp();
-                blastBulkTS = packet.getTimeStamp();
-                bbulkPacketCountHelper = 1;
-                bbulkSizeHelper = size;
+            if (((packet.getTimeStamp() - bwdLastBulkTS) / (double) 1000000) > 1.0) {
+                bwdBulkStartHelper = packet.getTimeStamp();
+                bwdLastBulkTS = packet.getTimeStamp();
+                bwdBulkPacketCountHelper = 1;
+                bwdBulkSizeHelper = size;
             }// Add to bulk
             else {
-                bbulkPacketCountHelper += 1;
-                bbulkSizeHelper += size;
+                bwdBulkPacketCountHelper += 1;
+                bwdBulkSizeHelper += size;
                 //New bulk
-                if (bbulkPacketCountHelper == 4) {
-                    bbulkStateCount += 1;
-                    bbulkPacketCount += bbulkPacketCountHelper;
-                    bbulkSizeTotal += bbulkSizeHelper;
-                    bbulkDuration += packet.getTimeStamp() - bbulkStartHelper;
+                if (bwdBulkPacketCountHelper == 4) {
+                    bwdBulkStateCount += 1;
+                    bwdBulkPacketCount += bwdBulkPacketCountHelper;
+                    bwdBulkSizeTotal += bwdBulkSizeHelper;
+                    bwdBulkDuration += packet.getTimeStamp() - bwdBulkStartHelper;
                 } //Continuation of existing bulk
-                else if (bbulkPacketCountHelper > 4) {
-                    bbulkPacketCount += 1;
-                    bbulkSizeTotal += size;
-                    bbulkDuration += packet.getTimeStamp() - blastBulkTS;
+                else if (bwdBulkPacketCountHelper > 4) {
+                    bwdBulkPacketCount += 1;
+                    bwdBulkSizeTotal += size;
+                    bwdBulkDuration += packet.getTimeStamp() - bwdLastBulkTS;
                 }
-                blastBulkTS = packet.getTimeStamp();
+                bwdLastBulkTS = packet.getTimeStamp();
             }
         }
 
     }
 
     public long fbulkStateCount() {
-        return fbulkStateCount;
+        return fwdBulkStateCount;
     }
 
     public long fbulkSizeTotal() {
-        return fbulkSizeTotal;
+        return fwdBulkSizeTotal;
     }
 
     public long fbulkPacketCount() {
-        return fbulkPacketCount;
+        return fwdBulkPacketCount;
     }
 
     public long fbulkDuration() {
-        return fbulkDuration;
+        return fwdBulkDuration;
     }
 
     public double fbulkDurationInSecond() {
-        return fbulkDuration / (double) 1000000;
+        return fwdBulkDuration / (double) 1000000;
     }
 
 
@@ -650,23 +573,23 @@ public class BasicFlow {
 
     //new features server
     public long bbulkPacketCount() {
-        return bbulkPacketCount;
+        return bwdBulkPacketCount;
     }
 
     public long bbulkStateCount() {
-        return bbulkStateCount;
+        return bwdBulkStateCount;
     }
 
     public long bbulkSizeTotal() {
-        return bbulkSizeTotal;
+        return bwdBulkSizeTotal;
     }
 
     public long bbulkDuration() {
-        return bbulkDuration;
+        return bwdBulkDuration;
     }
 
     public double bbulkDurationInSecond() {
-        return bbulkDuration / (double) 1000000;
+        return bwdBulkDuration / (double) 1000000;
     }
 
     //Server average bytes per bulk
@@ -700,10 +623,8 @@ public class BasicFlow {
             }
             this.flowIdle.addValue(currentTime - this.endActiveTime);
             this.startActiveTime = currentTime;
-            this.endActiveTime = currentTime;
-        } else {
-            this.endActiveTime = currentTime;
         }
+        this.endActiveTime = currentTime;
     }
 
     public void endActiveIdleTime(long currentTime, long threshold, long flowTimeOut, boolean isFlagEnd) {
@@ -717,12 +638,8 @@ public class BasicFlow {
         }
     }
 
-    public int packetCount() {
-        if (isBidirectional) {
-            return (this.forward.size() + this.backward.size());
-        } else {
-            return this.forward.size();
-        }
+    public int getPacketCount() {
+        return forward.size() + backward.size();
     }
 
     public List<BasicPacketInfo> getForward() {
@@ -822,11 +739,11 @@ public class BasicFlow {
     }
 
     public long getLastSeen() {
-        return flowLastSeen;
+        return flowLastSeenTime;
     }
 
     public void setLastSeen(long lastSeen) {
-        this.flowLastSeen = lastSeen;
+        this.flowLastSeenTime = lastSeen;
     }
 
     public long getStartActiveTime() {
@@ -858,7 +775,7 @@ public class BasicFlow {
     }
 
     public long getFlowDuration() {
-        return flowLastSeen - flowStartTime;
+        return flowLastSeenTime - flowStartTime;
     }
 
     public long getTotalFwdPackets() {
@@ -911,11 +828,11 @@ public class BasicFlow {
 
     public double getFlowBytesPerSec() {
         //flow duration is in microseconds, therefore packets per seconds = packets / (duration/1000000)
-        return ((double) (forwardBytes + backwardBytes)) / ((double) getFlowDuration() / 1000000L);
+        return ((double) (fwdBytes + bwdBytes)) / ((double) getFlowDuration() / 1000000L);
     }
 
     public double getFlowPacketsPerSec() {
-        return ((double) packetCount()) / ((double) getFlowDuration() / 1000000L);
+        return ((double) getPacketCount()) / ((double) getFlowDuration() / 1000000L);
     }
 
     public SummaryStatistics getFlowIAT() {
@@ -962,22 +879,6 @@ public class BasicFlow {
         return (backward.size() > 1) ? backwardIAT.getMin() : 0;
     }
 
-    public int getFwdPSHFlags() {
-        return fPSH_cnt;
-    }
-
-    public int getBwdPSHFlags() {
-        return bPSH_cnt;
-    }
-
-    public int getFwdURGFlags() {
-        return fURG_cnt;
-    }
-
-    public int getBwdURGFlags() {
-        return bURG_cnt;
-    }
-
     public int getFwdFINFlags() {
         return fFIN_cnt;
     }
@@ -997,11 +898,11 @@ public class BasicFlow {
     }
 
     public long getFwdHeaderLength() {
-        return fHeaderBytes;
+        return fwdHeaderBytes;
     }
 
     public long getBwdHeaderLength() {
-        return bHeaderBytes;
+        return bwdHeaderBytes;
     }
 
     public double getMinPacketLength() {
@@ -1028,20 +929,20 @@ public class BasicFlow {
         return flagCounts.get(key).value;
     }
 
-    public int getInit_Win_bytes_forward() {
-        return Init_Win_bytes_forward;
+    public int getFwdInitWinBytes() {
+        return fwdInitWinBytes;
     }
 
-    public int getInit_Win_bytes_backward() {
-        return Init_Win_bytes_backward;
+    public int getBwdInitWinBytes() {
+        return bwdInitWinBytes;
     }
 
-    public long getAct_data_pkt_forward() {
-        return Act_data_pkt_forward;
+    public long getFwdPacketsWithData() {
+        return fwdPacketsWithData;
     }
 
     public long getmin_seg_size_forward() {
-        return min_seg_size_forward;
+        return minFwdSegmentSize;
     }
 
     public double getActiveMean() {
@@ -1116,7 +1017,7 @@ public class BasicFlow {
         String starttime = DateFormatter.convertMilliseconds2String(flowStartTime / 1000L, "yyyy-MM-dd HH:mm:ss");
         dump.append(starttime).append(separator);                                    //7
 
-        long flowDuration = flowLastSeen - flowStartTime;
+        long flowDuration = flowLastSeenTime - flowStartTime;
         dump.append(flowDuration).append(separator);                                //8
 
         dump.append(fwdPktStats.getN()).append(separator);                            //9
@@ -1143,8 +1044,8 @@ public class BasicFlow {
         }
 
         if (this.forward.size() + this.backward.size() > 1) {
-            dump.append(((double) (forwardBytes + backwardBytes)) / ((double) flowDuration / 1000000L)).append(separator);//21
-            dump.append(((double) packetCount()) / ((double) flowDuration / 1000000L)).append(separator);//22
+            dump.append(((double) (fwdBytes + bwdBytes)) / ((double) flowDuration / 1000000L)).append(separator);//21
+            dump.append(((double) getPacketCount()) / ((double) flowDuration / 1000000L)).append(separator);//22
             dump.append(flowIAT.getMean()).append(separator);                            //23
             dump.append(flowIAT.getStandardDeviation()).append(separator);                //24
             dump.append(flowIAT.getMax()).append(separator);                            //25
@@ -1174,13 +1075,13 @@ public class BasicFlow {
             addZeros(dump, 5);
         }
 
-        dump.append(fPSH_cnt).append(separator);                                    //37
-        dump.append(bPSH_cnt).append(separator);                                    //38
-        dump.append(fURG_cnt).append(separator);                                    //39
-        dump.append(bURG_cnt).append(separator);                                    //40
+        dump.append(flagCounts.get("PSH_FWD").value).append(separator);                                    //37
+        dump.append(flagCounts.get("PSH_BWD").value).append(separator);                                    //38
+        dump.append(flagCounts.get("UGR_FWD").value).append(separator);                                    //39
+        dump.append(flagCounts.get("URG_BWD").value).append(separator);                                    //40
 
-        dump.append(fHeaderBytes).append(separator);                                //41
-        dump.append(bHeaderBytes).append(separator);                                //42
+        dump.append(fwdHeaderBytes).append(separator);                                //41
+        dump.append(bwdHeaderBytes).append(separator);                                //42
         dump.append(getfPktsPerSecond()).append(separator);                            //43
         dump.append(getbPktsPerSecond()).append(separator);                            //44
 
@@ -1211,7 +1112,7 @@ public class BasicFlow {
         dump.append(flagCounts.get("ECE").value).append(separator);                  //57
 
         dump.append(getDownUpRatio()).append(separator);                            //58
-        dump.append(getAvgPacketSize()).append(separator);                            //59
+//        dump.append(getAvgPacketSize()).append(separator);                            //59
         dump.append(fAvgSegmentSize()).append(separator);                            //60
         dump.append(bAvgSegmentSize()).append(separator);                            //61
         //dump.append(fHeaderBytes).append(separator);								//62 dupicate with 41
@@ -1228,10 +1129,10 @@ public class BasicFlow {
         dump.append(getSflow_bpackets()).append(separator);                            //71
         dump.append(getSflow_bbytes()).append(separator);                            //72
 
-        dump.append(Init_Win_bytes_forward).append(separator);                        //73
-        dump.append(Init_Win_bytes_backward).append(separator);                        //74
-        dump.append(Act_data_pkt_forward).append(separator);                        //75
-        dump.append(min_seg_size_forward).append(separator);                        //76
+        dump.append(fwdInitWinBytes).append(separator);                        //73
+        dump.append(bwdInitWinBytes).append(separator);                        //74
+        dump.append(fwdPacketsWithData).append(separator);                        //75
+        dump.append(minFwdSegmentSize).append(separator);                        //76
 
 
         if (this.flowActive.getN() > 0) {
