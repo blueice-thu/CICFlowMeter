@@ -283,13 +283,11 @@ public class BasicFlow {
     }
 
     public void updateFlowBulk(BasicPacketInfo packet) {
-
-        if (this.src == packet.getSrc()) {
+        if (isForwardPacket(packet)) {
             updateForwardBulk(packet, bwdLastBulkTS);
         } else {
             updateBackwardBulk(packet, fwdLastBulkTS);
         }
-
     }
 
     public void updateFlowState(BasicPacketInfo packet) {
@@ -526,22 +524,6 @@ public class BasicFlow {
 
     }
 
-    public long fbulkStateCount() {
-        return fwdBulkStateCount;
-    }
-
-    public long fbulkSizeTotal() {
-        return fwdBulkSizeTotal;
-    }
-
-    public long fbulkPacketCount() {
-        return fwdBulkPacketCount;
-    }
-
-    public long fbulkDuration() {
-        return fwdBulkDuration;
-    }
-
     public double fbulkDurationInSecond() {
         return fwdBulkDuration / (double) 1000000;
     }
@@ -549,24 +531,24 @@ public class BasicFlow {
 
     //Client average bytes per bulk
     public long fAvgBytesPerBulk() {
-        if (this.fbulkStateCount() != 0)
-            return (this.fbulkSizeTotal() / this.fbulkStateCount());
+        if (fwdBulkStateCount != 0)
+            return (fwdBulkSizeTotal / fwdBulkStateCount);
         return 0;
     }
 
 
     //Client average packets per bulk
     public long fAvgPacketsPerBulk() {
-        if (this.fbulkStateCount() != 0)
-            return (this.fbulkPacketCount() / this.fbulkStateCount());
+        if (fwdBulkStateCount != 0)
+            return (fwdBulkPacketCount / fwdBulkStateCount);
         return 0;
     }
 
 
     //Client average bulk rate
     public long fAvgBulkRate() {
-        if (this.fbulkDuration() != 0)
-            return (long) (this.fbulkSizeTotal() / this.fbulkDurationInSecond());
+        if (fwdBulkDuration != 0)
+            return (long) (fwdBulkSizeTotal / this.fbulkDurationInSecond());
         return 0;
     }
 
@@ -983,7 +965,6 @@ public class BasicFlow {
     }
 
     public int getService() {
-
         return ServiceType.getService(this).ordinal();
     }
 
@@ -1156,7 +1137,7 @@ public class BasicFlow {
         dump.append(getLand()).append(separator); // land
         dump.append(getService()).append(separator); // service
         dump.append(wrongFragmentCount).append(separator); // wrong_fragment
-        dump.append(getFlowState()).append(separator); // wrong_fragment
+        dump.append(getFlowState()).append(separator); // flow_state
 
         dump.append(getLabel());
 

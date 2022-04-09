@@ -24,7 +24,7 @@ public class LoadPcapInterfaceWorker extends SwingWorker<List<PcapIf>, String> {
         StringBuilder errbuf = new StringBuilder();
         List<PcapIf> ifs = new ArrayList<>();
         if (Pcap.findAllDevs(ifs, errbuf) != Pcap.OK) {
-            logger.error("Error occured: " + errbuf);
+            logger.error("Error occurred: " + errbuf);
             throw new Exception(errbuf.toString());
         }
         return ifs;

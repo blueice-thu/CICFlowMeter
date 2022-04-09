@@ -312,7 +312,7 @@ public class FlowOfflinePane extends JPanel {
                 ret = (long) o;
             } else {
                 input = (String) param.getEditor().getItem();
-                ret = Long.valueOf(input);
+                ret = Long.parseLong(input);
             }
             paramEle.add(ret);
 

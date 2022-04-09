@@ -2,22 +2,17 @@ package cic.cs.unb.ca.flow.ui;
 
 import cic.cs.unb.ca.Sys;
 import cic.cs.unb.ca.flow.FlowMgr;
-import cic.cs.unb.ca.guava.Event.FlowVisualEvent;
-import cic.cs.unb.ca.guava.GuavaMgr;
 import cic.cs.unb.ca.jnetpcap.BasicFlow;
 import cic.cs.unb.ca.jnetpcap.FlowFeature;
 import cic.cs.unb.ca.jnetpcap.PcapIfWrapper;
 import cic.cs.unb.ca.jnetpcap.worker.InsertCsvRow;
 import cic.cs.unb.ca.jnetpcap.worker.LoadPcapInterfaceWorker;
 import cic.cs.unb.ca.jnetpcap.worker.TrafficFlowWorker;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jnetpcap.PcapIf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import swing.common.InsertTableRow;
-import swing.common.JTable2CSVWorker;
-import swing.common.TextFileFilter;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -118,67 +113,6 @@ public class FlowMonitorPane extends JPanel {
         pane.add(scrollPane, BorderLayout.CENTER);
 
         return pane;
-    }
-
-    private JPanel initTableBtnPane() {
-        JPanel btnPane = new JPanel();
-        btnPane.setLayout(new BoxLayout(btnPane, BoxLayout.X_AXIS));
-        btnSave = new JButton("Save as");
-        btnGraph = new JButton("Graphs");
-        btnSave.setFocusable(false);
-        btnSave.setEnabled(false);
-        btnGraph.setFocusable(false);
-        btnGraph.setEnabled(false);
-
-        fileChooser = new JFileChooser(new File(FlowMgr.getInstance().getmDataPath()));
-        TextFileFilter csvChooserFilter = new TextFileFilter("csv file (*.csv)", new String[]{"csv"});
-        fileChooser.setFileFilter(csvChooserFilter);
-
-        btnSave.addActionListener(actionEvent -> {
-            int action = fileChooser.showSaveDialog(FlowMonitorPane.this);
-            if (action == JFileChooser.APPROVE_OPTION) {
-
-                File selectedFile = fileChooser.getSelectedFile();
-                String filename = selectedFile.getName();
-                if (FilenameUtils.getExtension(filename).equalsIgnoreCase("csv")) {
-                    //save name ok
-                } else {
-                    selectedFile = new File(selectedFile.getParentFile(), FilenameUtils.getBaseName(filename) + ".csv");
-                }
-                String title = "file conflict";
-                String message = "Another file with the same name already exists,do you want to overwrite?";
-
-                if (selectedFile.exists()) {
-
-                    int reply = JOptionPane.showConfirmDialog(this, message, title, JOptionPane.YES_NO_OPTION);
-
-                    if (reply == JOptionPane.YES_OPTION) {
-                        JTable2CSVWorker worker = new JTable2CSVWorker(flowTable, selectedFile);
-                        worker.execute();
-                    } else {
-                        btnSave.doClick();
-                    }
-                } else {
-                    JTable2CSVWorker worker = new JTable2CSVWorker(flowTable, selectedFile);
-                    worker.execute();
-                }
-                lastSave = selectedFile;
-                btnGraph.setEnabled(true);
-            }
-
-        });
-
-        btnGraph.addActionListener(actionEvent -> GuavaMgr.getInstance().getEventBus().post(new FlowVisualEvent(lastSave)));
-
-        btnPane.add(Box.createHorizontalGlue());
-        btnPane.add(btnSave);
-        btnPane.add(Box.createHorizontalGlue());
-        btnPane.add(btnGraph);
-        btnPane.add(Box.createHorizontalGlue());
-
-        btnPane.setBorder(BorderFactory.createRaisedSoftBevelBorder());
-
-        return btnPane;
     }
 
     private JPanel initStatusPane() {

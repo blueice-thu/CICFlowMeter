@@ -45,11 +45,7 @@ public class StatusBar extends JPanel {
     }
 
     public static void main(String[] args) {
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                createAndShowGUI();
-            }
-        });
+        javax.swing.SwingUtilities.invokeLater(StatusBar::createAndShowGUI);
     }
 
     public void setLeftTxt(String str) {

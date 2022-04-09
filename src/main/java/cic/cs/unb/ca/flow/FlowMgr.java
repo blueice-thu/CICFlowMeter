@@ -24,7 +24,7 @@ public class FlowMgr {
         return Instance;
     }
 
-    public FlowMgr init() {
+    public void init() {
 
         String rootPath = System.getProperty("user.dir");
         StringBuilder sb = new StringBuilder(rootPath);
@@ -35,7 +35,6 @@ public class FlowMgr {
         sb.append("daily").append(Sys.FILE_SEP);
         mFlowSavePath = sb.toString();
 
-        return Instance;
     }
 
     public void destroy() {

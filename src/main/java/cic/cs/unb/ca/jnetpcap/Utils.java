@@ -4,7 +4,10 @@ import org.apache.tika.Tika;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.LineNumberReader;
 
 public class Utils {
     public static final String FILE_SEP = System.getProperty("file.separator");
@@ -32,21 +35,6 @@ public class Utils {
 
             return isPcapFile(new Tika().detect(file));
 
-        } catch (IOException e) {
-            logger.debug(e.getMessage());
-        }
-
-        return false;
-    }
-
-    public static boolean isPcapFile(InputStream stream) {
-
-        if (stream == null) {
-            return false;
-        }
-
-        try {
-            return isPcapFile(new Tika().detect(stream));
         } catch (IOException e) {
             logger.debug(e.getMessage());
         }

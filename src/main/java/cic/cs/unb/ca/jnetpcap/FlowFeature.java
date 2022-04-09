@@ -5,9 +5,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public enum FlowFeature {
 
     fid("Flow ID", "FID", false),                    //1 this index is for feature not for ordinal
@@ -107,7 +104,6 @@ public enum FlowFeature {
     private final String name;
     private final String abbr;
     private final boolean isNumeric;
-    private String[] values;
 
     FlowFeature(String name, String abbr, boolean numeric) {
         this.name = name;
@@ -125,7 +121,6 @@ public enum FlowFeature {
     FlowFeature(String name, String abbr, String[] values) {
         this.name = name;
         this.abbr = abbr;
-        this.values = values;
         isNumeric = false;
     }
 
@@ -139,7 +134,6 @@ public enum FlowFeature {
     }
 
     public static String getHeader() {
-
         if (HEADER == null || HEADER.length() == 0) {
             StringBuilder header = new StringBuilder();
 
@@ -150,15 +144,6 @@ public enum FlowFeature {
             HEADER = header.toString();
         }
         return HEADER;
-    }
-
-    public static List<FlowFeature> getFeatureList() {
-        List<FlowFeature> features = new ArrayList<>();
-        features.add(prot);
-        for (int i = fl_dur.ordinal(); i <= idl_min.ordinal(); i++) {
-            features.add(FlowFeature.values()[i]);
-        }
-        return features;
     }
 
     public static String featureValue2String(FlowFeature feature, String value) {
