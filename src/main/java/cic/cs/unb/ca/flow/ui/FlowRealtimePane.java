@@ -27,8 +27,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class FlowMonitorPane extends JPanel {
-    protected static final Logger logger = LoggerFactory.getLogger(FlowMonitorPane.class);
+public class FlowRealtimePane extends JPanel {
+    protected static final Logger logger = LoggerFactory.getLogger(FlowRealtimePane.class);
 
 
     private JTable flowTable;
@@ -53,7 +53,7 @@ public class FlowMonitorPane extends JPanel {
     private ExecutorService csvWriterThread;
 
 
-    public FlowMonitorPane() {
+    public FlowRealtimePane() {
         init();
 
         setLayout(new BorderLayout(5, 5));
@@ -306,7 +306,7 @@ public class FlowMonitorPane extends JPanel {
 
         //write flows to csv file
         String header = FlowFeature.getHeader();
-        String path = FlowMgr.getInstance().getSavePath();
+        String path = FlowMgr.getInstance().getFlowSavePath();
         String filename = LocalDate.now() + FlowMgr.FLOW_SUFFIX;
         csvWriterThread.execute(new InsertCsvRow(header, flowStringList, path, filename));
 

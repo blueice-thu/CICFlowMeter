@@ -36,19 +36,6 @@ public class BasicPacketInfo {
 
     private boolean isWrongFragment = false;
 
-    public BasicPacketInfo(byte[] src, byte[] dst, int srcPort, int dstPort,
-                           int protocol, long timeStamp, IdGenerator generator) {
-        super();
-        this.id = generator.nextId();
-        this.src = src;
-        this.dst = dst;
-        this.srcPort = srcPort;
-        this.dstPort = dstPort;
-        this.protocol = protocol;
-        this.timeStamp = timeStamp;
-        generateFlowId();
-    }
-
     public BasicPacketInfo(IdGenerator generator) {
         super();
         this.id = generator.nextId();

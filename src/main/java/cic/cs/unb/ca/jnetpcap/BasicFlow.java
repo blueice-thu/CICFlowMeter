@@ -113,6 +113,13 @@ public class BasicFlow {
         fwdInitWindow = packet.getTCPWindow();
     }
 
+    static class MutableInt {
+        public int value = 0; // note that we start at 1 since we're counting
+        public void increment() {
+            ++value;
+        }
+    }
+
     private boolean isForwardPacket(BasicPacketInfo packet) {
         return Arrays.equals(this.src, packet.getSrc());
     }
@@ -1143,18 +1150,4 @@ public class BasicFlow {
 
         return dump.toString();
     }
-}
-
-class MutableInt {
-    int value = 0; // note that we start at 1 since we're counting
-
-    public void increment() {
-        ++value;
-    }
-
-    public int get() {
-        return value;
-    }
-
-
 }

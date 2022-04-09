@@ -41,7 +41,7 @@ public class PcapReader {
         boolean readIP4 = true;
         PacketReader packetReader = new PacketReader(inputFile, readIP4, readIP6);
 
-        System.out.println(String.format("Working on... %s", fileName));
+        System.out.printf("Working on... %s%n", fileName);
 
         int nValid = 0;
         int nTotal = 0;
@@ -66,8 +66,8 @@ public class PcapReader {
 
         long lines = countLines(saveFileFullPath.getPath());
 
-        System.out.println(String.format("%s is done. total %d flows ", fileName, lines));
-        System.out.println(String.format("Packet stats: Total=%d,Valid=%d,Discarded=%d", nTotal, nValid, nDiscarded));
+        System.out.printf("%s is done. total %d flows %n", fileName, lines);
+        System.out.printf("Packet stats: Total=%d,Valid=%d,Discarded=%d%n", nTotal, nValid, nDiscarded);
         System.out.println("-----------------------------------------------------------------------------------------");
 
     }

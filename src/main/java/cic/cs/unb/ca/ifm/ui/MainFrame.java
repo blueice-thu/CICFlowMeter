@@ -1,7 +1,7 @@
 package cic.cs.unb.ca.ifm.ui;
 
 import cic.cs.unb.ca.flow.FlowMgr;
-import cic.cs.unb.ca.flow.ui.FlowMonitorPane;
+import cic.cs.unb.ca.flow.ui.FlowRealtimePane;
 import cic.cs.unb.ca.flow.ui.FlowOfflinePane;
 import swing.common.SwingUtils;
 
@@ -15,7 +15,7 @@ public class MainFrame extends JFrame {
     private static final long serialVersionUID = 7419600803861028585L;
 
     private final FlowOfflinePane offLinePane;
-    private final FlowMonitorPane monitorPane;
+    private final FlowRealtimePane monitorPane;
 
     public MainFrame() throws HeadlessException {
         super("CICFlowMeter");
@@ -39,7 +39,7 @@ public class MainFrame extends JFrame {
         initMenu();
 
         offLinePane = new FlowOfflinePane();
-        monitorPane = new FlowMonitorPane();
+        monitorPane = new FlowRealtimePane();
         getContentPane().add(monitorPane, BorderLayout.CENTER);
 
         setVisible(true);

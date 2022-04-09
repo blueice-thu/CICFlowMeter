@@ -132,11 +132,7 @@ public class Cmd {
         int nValid = 0;
         int nTotal = 0;
         int nDiscarded = 0;
-//        long start = System.currentTimeMillis();
-//        int i = 0;
         while (true) {
-//            i = (i)%animationChars.length;
-//            System.out.print("Working on "+ inputFile+" "+ animationChars[i] +"\r");
             try {
                 BasicPacketInfo basicPacket = packetReader.nextPacket();
                 nTotal++;
@@ -149,7 +145,6 @@ public class Cmd {
             } catch (PcapClosedException e) {
                 break;
             }
-//            i++;
         }
 
         flowGen.dumpLabeledCurrentFlow(saveFileFullPath.getPath(), FlowFeature.getHeader());
@@ -159,17 +154,6 @@ public class Cmd {
         System.out.printf("%s is done. total %d flows %n", fileName, lines);
         System.out.printf("Packet stats: Total=%d,Valid=%d,Discarded=%d%n", nTotal, nValid, nDiscarded);
         System.out.println(DividingLine);
-
-        //long end = System.currentTimeMillis();
-        //logger.info(String.format("Done! in %d seconds",((end-start)/1000)));
-        //logger.info(String.format("\t Total packets: %d",nTotal));
-        //logger.info(String.format("\t Valid packets: %d",nValid));
-        //logger.info(String.format("\t Ignored packets:%d %d ", nDiscarded,(nTotal-nValid)));
-        //logger.info(String.format("PCAP duration %d seconds",((packetReader.getLastPacket()- packetReader.getFirstPacket())/1000)));
-        //int singleTotal = flowGen.dumpLabeledFlowBasedFeatures(outPath, fileName+ FlowMgr.FLOW_SUFFIX, FlowFeature.getHeader());
-        //logger.info(String.format("Number of Flows: %d",singleTotal));
-        //logger.info("{} is done,Total {} flows",inputFile,singleTotal);
-        //System.out.println(String.format("%s is done,Total %d flows", inputFile, singleTotal));
     }
 
     static class FlowListener implements FlowGenListener {
