@@ -12,7 +12,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import static cic.cs.unb.ca.jnetpcap.Utils.*;
+import static cic.cs.unb.ca.Common.FILE_SEP;
+import static cic.cs.unb.ca.Common.FLOW_SUFFIX;
+import static cic.cs.unb.ca.jnetpcap.Utils.countLines;
+import static cic.cs.unb.ca.jnetpcap.Utils.isPcapFile;
 
 
 public class ReadPcapFileWorker extends SwingWorker<List<String>, String> {
@@ -138,7 +141,7 @@ public class ReadPcapFileWorker extends SwingWorker<List<String>, String> {
             outPath += FILE_SEP;
         }
 
-        File saveFileFullPath = new File(outPath + fileName + Utils.FLOW_SUFFIX);
+        File saveFileFullPath = new File(outPath + fileName + FLOW_SUFFIX);
 
         if (saveFileFullPath.exists()) {
             if (!saveFileFullPath.delete()) {
@@ -190,7 +193,7 @@ public class ReadPcapFileWorker extends SwingWorker<List<String>, String> {
         chunks.add(String.format("\t Ignored packets:%d %d ", nDiscarded,(nTotal-nValid)));
         chunks.add(String.format("PCAP duration %d seconds",((packetReader.getLastPacket()- packetReader.getFirstPacket())/1000)));
         chunks.add(DividingLine);
-        int singleTotal = flowGen.dumpLabeledFlowBasedFeatures(outPath, fullname+ FlowMgr.FLOW_SUFFIX, FlowFeature.getHeader());
+        int singleTotal = flowGen.dumpLabeledFlowBasedFeatures(outPath, fullname+ Common.FLOW_SUFFIX, FlowFeature.getHeader());
         chunks.add(String.format("Number of Flows: %d",singleTotal));
         chunks.add("");
         publish(chunks.toArray( new String[chunks.size()]));

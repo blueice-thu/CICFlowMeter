@@ -1,7 +1,5 @@
-package cic.cs.unb.ca.flow.ui;
+package cic.cs.unb.ca.ui;
 
-import cic.cs.unb.ca.Sys;
-import cic.cs.unb.ca.flow.FlowMgr;
 import cic.cs.unb.ca.jnetpcap.BasicFlow;
 import cic.cs.unb.ca.jnetpcap.FlowFeature;
 import cic.cs.unb.ca.jnetpcap.PcapIfWrapper;
@@ -26,6 +24,8 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static cic.cs.unb.ca.Common.*;
 
 public class FlowRealtimePane extends JPanel {
     protected static final Logger logger = LoggerFactory.getLogger(FlowRealtimePane.class);
@@ -279,21 +279,17 @@ public class FlowRealtimePane extends JPanel {
             mWorker.cancel(true);
         }
 
-        //FlowMgr.getInstance().stopFetchFlow();
-
         btnLoad.setEnabled(true);
 
 
-        String path = FlowMgr.getInstance().getAutoSaveFile();
+        String path = FLOW_SAVE_PATH + LocalDate.now() + FLOW_SUFFIX;
         logger.info("path:{}", path);
 
         if (defaultTableModel.getRowCount() > 0 && new File(path).exists()) {
-            StringBuilder msg = new StringBuilder("The flow has been saved to :");
-            msg.append(Sys.LINE_SEP);
-            msg.append(path);
+            String msg = "The flow has been saved to :" + LINE_SEP + path;
 
             UIManager.put("OptionPane.minimumSize", new Dimension(0, 0));
-            JOptionPane.showMessageDialog(this.getParent(), msg.toString());
+            JOptionPane.showMessageDialog(this.getParent(), msg);
         }
     }
 
@@ -306,9 +302,8 @@ public class FlowRealtimePane extends JPanel {
 
         //write flows to csv file
         String header = FlowFeature.getHeader();
-        String path = FlowMgr.getInstance().getFlowSavePath();
-        String filename = LocalDate.now() + FlowMgr.FLOW_SUFFIX;
-        csvWriterThread.execute(new InsertCsvRow(header, flowStringList, path, filename));
+        String filename = LocalDate.now() + FLOW_SUFFIX;
+        csvWriterThread.execute(new InsertCsvRow(header, flowStringList, FLOW_SAVE_PATH, filename));
 
         //insert flows to JTable
         SwingUtilities.invokeLater(new InsertTableRow(defaultTableModel, flowDataList, lblFlowCnt));

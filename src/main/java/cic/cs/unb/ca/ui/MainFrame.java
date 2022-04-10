@@ -1,8 +1,5 @@
-package cic.cs.unb.ca.ifm.ui;
+package cic.cs.unb.ca.ui;
 
-import cic.cs.unb.ca.flow.FlowMgr;
-import cic.cs.unb.ca.flow.ui.FlowRealtimePane;
-import cic.cs.unb.ca.flow.ui.FlowOfflinePane;
 import swing.common.SwingUtils;
 
 import javax.swing.*;
@@ -54,7 +51,6 @@ public class MainFrame extends JFrame {
 
         JMenuItem itemExit = new JMenuItem("Exit");
         itemExit.addActionListener(arg0 -> {
-            FlowMgr.getInstance().destroy();
             System.exit(EXIT_ON_CLOSE);
         });
         mnFile.add(itemExit);

@@ -1,6 +1,5 @@
 package cic.cs.unb.ca.ifm;
 
-import cic.cs.unb.ca.flow.FlowMgr;
 import cic.cs.unb.ca.jnetpcap.*;
 import cic.cs.unb.ca.jnetpcap.worker.FlowGenListener;
 import cic.cs.unb.ca.jnetpcap.worker.InsertCsvRow;
@@ -14,7 +13,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static cic.cs.unb.ca.Sys.FILE_SEP;
+import static cic.cs.unb.ca.Common.FILE_SEP;
+import static cic.cs.unb.ca.Common.FLOW_SUFFIX;
 
 public class Cmd {
 
@@ -113,7 +113,7 @@ public class Cmd {
             outPath += FILE_SEP;
         }
 
-        File saveFileFullPath = new File(outPath + fileName + FlowMgr.FLOW_SUFFIX);
+        File saveFileFullPath = new File(outPath + fileName + FLOW_SUFFIX);
 
         if (saveFileFullPath.exists()) {
             if (!saveFileFullPath.delete()) {
@@ -175,7 +175,7 @@ public class Cmd {
             String flowDump = flow.dumpFlowBasedFeaturesEx();
             List<String> flowStringList = new ArrayList<>();
             flowStringList.add(flowDump);
-            InsertCsvRow.insert(FlowFeature.getHeader(), flowStringList, outPath, fileName + FlowMgr.FLOW_SUFFIX);
+            InsertCsvRow.insert(FlowFeature.getHeader(), flowStringList, outPath, fileName + FLOW_SUFFIX);
 
             cnt++;
 

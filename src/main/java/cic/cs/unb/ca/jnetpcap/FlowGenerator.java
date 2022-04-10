@@ -11,8 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
 
-import static cic.cs.unb.ca.jnetpcap.Utils.LINE_SEP;
-
+import static cic.cs.unb.ca.Common.LINE_SEP;
 
 public class FlowGenerator {
     public static final Logger logger = LoggerFactory.getLogger(FlowGenerator.class);

@@ -65,7 +65,6 @@ public class TrafficFlowWorker extends SwingWorker<String, String> implements Fl
             }
         };
 
-        //FlowMgr.getInstance().setListenFlag(true);
         logger.info("Pcap is listening...");
         firePropertyChange("progress", "open successfully", "listening: " + device);
         int ret = pcap.loop(Pcap.DISPATCH_BUFFER_FULL, jpacketHandler, device);

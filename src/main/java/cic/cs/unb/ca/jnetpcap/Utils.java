@@ -10,9 +10,6 @@ import java.io.IOException;
 import java.io.LineNumberReader;
 
 public class Utils {
-    public static final String FILE_SEP = System.getProperty("file.separator");
-    public static final String LINE_SEP = System.lineSeparator();
-    public static final String FLOW_SUFFIX = "_Flow.csv";
     protected static final Logger logger = LoggerFactory.getLogger(Utils.class);
     private final static String PCAP = "application/vnd.tcpdump.pcap";
 

@@ -1,6 +1,5 @@
-package cic.cs.unb.ca.flow.ui;
+package cic.cs.unb.ca.ui;
 
-import cic.cs.unb.ca.flow.FlowMgr;
 import cic.cs.unb.ca.jnetpcap.BasicFlow;
 import cic.cs.unb.ca.jnetpcap.FlowFeature;
 import cic.cs.unb.ca.jnetpcap.worker.InsertCsvRow;
@@ -20,6 +19,8 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import static cic.cs.unb.ca.Common.FLOW_SUFFIX;
 
 public class FlowOfflinePane extends JPanel {
     protected static final Logger logger = LoggerFactory.getLogger(FlowOfflinePane.class);
@@ -400,7 +401,7 @@ public class FlowOfflinePane extends JPanel {
 
                     //write flows to csv file
                     String header = FlowFeature.getHeader();
-                    csvWriterThread.execute(new InsertCsvRow(header, flow.dumpFlowBasedFeaturesEx(), out.getPath(), fileName + FlowMgr.FLOW_SUFFIX));
+                    csvWriterThread.execute(new InsertCsvRow(header, flow.dumpFlowBasedFeaturesEx(), out.getPath(), fileName + FLOW_SUFFIX));
                 }
             });
             worker.execute();

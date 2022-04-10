@@ -1,6 +1,5 @@
 package cic.cs.unb.ca.jnetpcap.worker;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,8 +9,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static cic.cs.unb.ca.jnetpcap.Utils.FILE_SEP;
-import static cic.cs.unb.ca.jnetpcap.Utils.LINE_SEP;
+import static cic.cs.unb.ca.Common.FILE_SEP;
+import static cic.cs.unb.ca.Common.LINE_SEP;
 
 public class InsertCsvRow implements Runnable {
     public static final Logger logger = LoggerFactory.getLogger(InsertCsvRow.class);
