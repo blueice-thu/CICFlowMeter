@@ -1,9 +1,9 @@
 package cic.cs.unb.ca.ui;
 
 import cic.cs.unb.ca.jnetpcap.BasicFlow;
-import cic.cs.unb.ca.jnetpcap.FlowFeature;
-import cic.cs.unb.ca.jnetpcap.worker.InsertCsvRow;
-import cic.cs.unb.ca.jnetpcap.worker.ReadPcapFileWorker;
+import cic.cs.unb.ca.jnetpcap.feature.FlowFeature;
+import cic.cs.unb.ca.worker.InsertCsvRow;
+import cic.cs.unb.ca.worker.ReadPcapFileWorker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import swing.common.PcapFileFilter;

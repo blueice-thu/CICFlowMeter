@@ -1,4 +1,4 @@
-package cic.cs.unb.ca.jnetpcap.worker;
+package cic.cs.unb.ca.worker;
 
 import cic.cs.unb.ca.jnetpcap.BasicFlow;
 

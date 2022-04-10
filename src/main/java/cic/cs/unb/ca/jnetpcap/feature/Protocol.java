@@ -1,4 +1,4 @@
-package cic.cs.unb.ca.jnetpcap;
+package cic.cs.unb.ca.jnetpcap.feature;
 
 import org.jnetpcap.protocol.network.Icmp;
 import org.jnetpcap.protocol.network.Ip4;

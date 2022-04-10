@@ -1,11 +1,11 @@
 package cic.cs.unb.ca.ui;
 
 import cic.cs.unb.ca.jnetpcap.BasicFlow;
-import cic.cs.unb.ca.jnetpcap.FlowFeature;
 import cic.cs.unb.ca.jnetpcap.PcapIfWrapper;
-import cic.cs.unb.ca.jnetpcap.worker.InsertCsvRow;
-import cic.cs.unb.ca.jnetpcap.worker.LoadPcapInterfaceWorker;
-import cic.cs.unb.ca.jnetpcap.worker.TrafficFlowWorker;
+import cic.cs.unb.ca.jnetpcap.feature.FlowFeature;
+import cic.cs.unb.ca.worker.InsertCsvRow;
+import cic.cs.unb.ca.worker.LoadPcapInterfaceWorker;
+import cic.cs.unb.ca.worker.TrafficFlowWorker;
 import org.apache.commons.lang3.StringUtils;
 import org.jnetpcap.PcapIf;
 import org.slf4j.Logger;
@@ -231,6 +231,9 @@ public class FlowRealtimePane extends JPanel {
 
     private void startTrafficFlow() {
 
+        if (list.getSelectedValue() == null) {
+            return;
+        }
         String ifName = list.getSelectedValue().name();
 
         if (mWorker != null && !mWorker.isCancelled()) {

@@ -1,6 +1,10 @@
-package cic.cs.unb.ca.jnetpcap.worker;
+package cic.cs.unb.ca.worker;
 
-import cic.cs.unb.ca.jnetpcap.*;
+import cic.cs.unb.ca.jnetpcap.BasicFlow;
+import cic.cs.unb.ca.jnetpcap.BasicPacketInfo;
+import cic.cs.unb.ca.jnetpcap.FlowGenerator;
+import cic.cs.unb.ca.jnetpcap.PacketReader;
+import cic.cs.unb.ca.jnetpcap.feature.FlowFeature;
 import org.jnetpcap.PcapClosedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

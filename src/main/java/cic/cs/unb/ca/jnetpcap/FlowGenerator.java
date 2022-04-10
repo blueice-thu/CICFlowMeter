@@ -1,6 +1,7 @@
 package cic.cs.unb.ca.jnetpcap;
 
-import cic.cs.unb.ca.jnetpcap.worker.FlowGenListener;
+import cic.cs.unb.ca.jnetpcap.feature.Protocol;
+import cic.cs.unb.ca.worker.FlowGenListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

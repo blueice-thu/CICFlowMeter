@@ -2,15 +2,9 @@ package cic.cs.unb.ca.jnetpcap;
 
 public class IdGenerator {
 
-    private long id = 0L;
-
-    public IdGenerator(long id) {
-        super();
-        this.id = id;
-    }
+    private long id;
 
     public IdGenerator() {
-        super();
         this.id = 0L;
     }
 

@@ -1,4 +1,7 @@
-package cic.cs.unb.ca.jnetpcap;
+package cic.cs.unb.ca.jnetpcap.feature;
+
+import cic.cs.unb.ca.jnetpcap.BasicFlow;
+import cic.cs.unb.ca.jnetpcap.BasicPacketInfo;
 
 public enum ServiceType {
     // General

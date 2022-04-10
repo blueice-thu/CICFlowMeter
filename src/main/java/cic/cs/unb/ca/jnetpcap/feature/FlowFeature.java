@@ -1,4 +1,4 @@
-package cic.cs.unb.ca.jnetpcap;
+package cic.cs.unb.ca.jnetpcap.feature;
 
 
 import org.apache.commons.lang3.math.NumberUtils;

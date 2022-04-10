@@ -1,8 +1,12 @@
 package cic.cs.unb.ca.ifm;
 
-import cic.cs.unb.ca.jnetpcap.*;
-import cic.cs.unb.ca.jnetpcap.worker.FlowGenListener;
-import cic.cs.unb.ca.jnetpcap.worker.InsertCsvRow;
+import cic.cs.unb.ca.jnetpcap.BasicFlow;
+import cic.cs.unb.ca.jnetpcap.BasicPacketInfo;
+import cic.cs.unb.ca.jnetpcap.FlowGenerator;
+import cic.cs.unb.ca.jnetpcap.PacketReader;
+import cic.cs.unb.ca.jnetpcap.feature.FlowFeature;
+import cic.cs.unb.ca.worker.FlowGenListener;
+import cic.cs.unb.ca.worker.InsertCsvRow;
 import org.apache.commons.io.FilenameUtils;
 import org.jnetpcap.PcapClosedException;
 import org.slf4j.Logger;

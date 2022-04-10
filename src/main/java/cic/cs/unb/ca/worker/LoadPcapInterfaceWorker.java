@@ -1,4 +1,4 @@
-package cic.cs.unb.ca.jnetpcap.worker;
+package cic.cs.unb.ca.worker;
 
 import org.jnetpcap.Pcap;
 import org.jnetpcap.PcapIf;

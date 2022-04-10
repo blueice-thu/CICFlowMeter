@@ -1,5 +1,8 @@
 package cic.cs.unb.ca.jnetpcap;
 
+import cic.cs.unb.ca.jnetpcap.feature.FlowState;
+import cic.cs.unb.ca.jnetpcap.feature.Protocol;
+import cic.cs.unb.ca.jnetpcap.feature.ServiceType;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.jnetpcap.packet.format.FormatUtils;
 
@@ -7,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+
+import static cic.cs.unb.ca.jnetpcap.Utils.convertMilliseconds2String;
 
 public class BasicFlow {
 
@@ -759,10 +764,6 @@ public class BasicFlow {
         return FormatUtils.ip(dst);
     }
 
-    public String getTimeStamp() {
-        return DateFormatter.parseDateFromLong(flowStartTime / 1000L, "yyyy-MM-dd HH:mm:ss");
-    }
-
     public long getFlowDuration() {
         return flowLastSeenTime - flowStartTime;
     }
@@ -1002,7 +1003,7 @@ public class BasicFlow {
         dump.append(getDstPort()).append(separator);                                //5
         dump.append(getProtocol()).append(separator);                                //6
 
-        String starttime = DateFormatter.convertMilliseconds2String(flowStartTime / 1000L, "yyyy-MM-dd HH:mm:ss");
+        String starttime = convertMilliseconds2String(flowStartTime / 1000L, "yyyy-MM-dd HH:mm:ss");
         dump.append(starttime).append(separator);                                    //7
 
         long flowDuration = flowLastSeenTime - flowStartTime;

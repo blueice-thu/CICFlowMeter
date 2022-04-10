@@ -8,6 +8,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.LineNumberReader;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 public class Utils {
     protected static final Logger logger = LoggerFactory.getLogger(Utils.class);
@@ -66,6 +70,17 @@ public class Utils {
             }
         }
         return linenumber;
+    }
+
+    public static String convertMilliseconds2String(long time, String format) {
+
+        if (format == null) {
+            format = "yyyy-MM-dd HH:mm:ss";
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+        LocalDateTime ldt = LocalDateTime.ofInstant(Instant.ofEpochMilli(time), ZoneId.systemDefault());
+        return ldt.format(formatter);
     }
 
 }
