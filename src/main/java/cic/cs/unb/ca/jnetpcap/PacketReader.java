@@ -165,7 +165,7 @@ public class PacketReader {
              * havn't fixed, so do not e.printStackTrace()
              */
             //e.printStackTrace();
-			packet.scan(protocol.getIpv4().getId());
+			packet.scan(Ip4.ID);
 			String errormsg = "";
 			errormsg+=e.getMessage()+"\n";
 			//errormsg+=packet.getHeader(new Ip4())+"\n";
@@ -208,7 +208,7 @@ public class PacketReader {
              * havn't fixed, so do not e.printStackTrace()
              */
             //e.printStackTrace();
-            packet.scan(protocol.getIpv6().getId());
+            packet.scan(Ip6.ID);
             String errormsg = "";
             errormsg+=e.getMessage()+"\n";
             //errormsg+=packet.getHeader(new Ip6())+"\n";
@@ -245,7 +245,7 @@ public class PacketReader {
              * havn't fixed, so do not e.printStackTrace()
              */
             //e.printStackTrace();
-            packet.scan(protocol.getL2tp().getId());
+            packet.scan(L2TP.ID);
             String errormsg = "";
             errormsg+=e.getMessage()+"\n";
             //errormsg+=packet.getHeader(new L2TP())+"\n";
