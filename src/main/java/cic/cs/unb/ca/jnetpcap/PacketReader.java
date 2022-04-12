@@ -29,14 +29,13 @@ public class PacketReader {
      * It doesn't matter just using a static IdGenerator for realtime PcapPacket reading
      */
     private Pcap pcapReader;
-    @Getter @Setter private long firstPacket;
-    @Getter @Setter private long lastPacket;
     private Tcp tcp;
     private Udp udp;
     private Icmp icmp;
     private Ip4 ipv4;
     private Ip6 ipv6;
     private L2TP l2tp;
+//    private Protocol protocol = new Protocol();
     private PcapHeader hdr;
     private JBuffer buf;
     private final boolean readIP6;
@@ -237,9 +236,6 @@ public class PacketReader {
         StringBuilder errbuf = new StringBuilder(); // For any error msgs
         pcapReader = Pcap.openOffline(filename, errbuf);
 
-        this.firstPacket = 0L;
-        this.lastPacket = 0L;
-
         if (pcapReader == null) {
             logger.error("Error while opening file for capture: " + errbuf);
             System.exit(-1);
@@ -301,12 +297,7 @@ public class PacketReader {
                 packetInfo.setDst(this.ipv4.destination());
                 packetInfo.setWrongFragment(!ipv4.isChecksumValid());
 
-                //packetInfo.setTimeStamp(packet.getCaptureHeader().timestampInMillis());
                 packetInfo.setTimeStamp(packet.getCaptureHeader().timestampInMicros());
-
-                if (this.firstPacket == 0L)
-                    this.firstPacket = packet.getCaptureHeader().timestampInMillis();
-                this.lastPacket = packet.getCaptureHeader().timestampInMillis();
 
                 if (packet.hasHeader(this.tcp)) {
                     packetInfo.setTCPWindow(tcp.window());
