@@ -1,6 +1,8 @@
 package cic.cs.unb.ca.jnetpcap;
 
 import cic.cs.unb.ca.jnetpcap.feature.Protocol;
+import lombok.Getter;
+import lombok.Setter;
 import org.jnetpcap.Pcap;
 import org.jnetpcap.PcapClosedException;
 import org.jnetpcap.PcapHeader;
@@ -26,11 +28,9 @@ public class PacketReader {
      * So far,The value of the field BasicPacketInfo.id is not used
      * It doesn't matter just using a static IdGenerator for realtime PcapPacket reading
      */
-    private static final IdGenerator idGen = new IdGenerator();
-    private final IdGenerator generator = new IdGenerator();
     private Pcap pcapReader;
-    private long firstPacket;
-    private long lastPacket;
+    @Getter @Setter private long firstPacket;
+    @Getter @Setter private long lastPacket;
     private Tcp tcp;
     private Udp udp;
     private Icmp icmp;
@@ -60,21 +60,14 @@ public class PacketReader {
     public static BasicPacketInfo getBasicPacketInfo(PcapPacket packet, boolean readIP4, boolean readIP6) {
         BasicPacketInfo packetInfo = null;
 
-
         Protocol protocol = new Protocol();
 
         if (readIP4) {
             packetInfo = getIpv4Info(packet, protocol);
-            if (packetInfo == null && readIP6) {
-                packetInfo = getIpv6Info(packet, protocol);
-            }
-        } else if (readIP6) {
-            packetInfo = getIpv6Info(packet, protocol);
-            if (packetInfo == null && readIP4) {
-                packetInfo = getIpv4Info(packet, protocol);
-            }
         }
-
+        if (packetInfo == null && readIP6) {
+            packetInfo = getIpv6Info(packet, protocol);
+        }
         if (packetInfo == null) {
             packetInfo = getVPNInfo(packet, protocol, readIP4, readIP6);
         }
@@ -128,7 +121,7 @@ public class PacketReader {
         BasicPacketInfo packetInfo = null;
         try {
             if (packet.hasHeader(protocol.getIpv6())) {
-                packetInfo = new BasicPacketInfo(idGen);
+                packetInfo = new BasicPacketInfo();
                 packetInfo.setSrc(protocol.getIpv6().source());
                 packetInfo.setDst(protocol.getIpv6().destination());
                 packetInfo.setTimeStamp(packet.getCaptureHeader().timestampInMillis());
@@ -172,7 +165,7 @@ public class PacketReader {
         try {
 
             if (packet.hasHeader(protocol.getIpv4())) {
-                packetInfo = new BasicPacketInfo(idGen);
+                packetInfo = new BasicPacketInfo();
                 packetInfo.setSrc(protocol.getIpv4().source());
                 packetInfo.setDst(protocol.getIpv4().destination());
                 packetInfo.setWrongFragment(!protocol.getIpv4().isChecksumValid());
@@ -303,7 +296,7 @@ public class PacketReader {
         try {
 
             if (packet.hasHeader(ipv4)) {
-                packetInfo = new BasicPacketInfo(this.generator);
+                packetInfo = new BasicPacketInfo();
                 packetInfo.setSrc(this.ipv4.source());
                 packetInfo.setDst(this.ipv4.destination());
                 packetInfo.setWrongFragment(!ipv4.isChecksumValid());
@@ -381,7 +374,7 @@ public class PacketReader {
         BasicPacketInfo packetInfo = null;
         try {
             if (packet.hasHeader(ipv6)) {
-                packetInfo = new BasicPacketInfo(this.generator);
+                packetInfo = new BasicPacketInfo();
                 packetInfo.setSrc(this.ipv6.source());
                 packetInfo.setDst(this.ipv6.destination());
                 packetInfo.setTimeStamp(packet.getCaptureHeader().timestampInMillis());
@@ -457,21 +450,5 @@ public class PacketReader {
         }
 
         return packetInfo;
-    }
-
-    public long getFirstPacket() {
-        return firstPacket;
-    }
-
-    public void setFirstPacket(long firstPacket) {
-        this.firstPacket = firstPacket;
-    }
-
-    public long getLastPacket() {
-        return lastPacket;
-    }
-
-    public void setLastPacket(long lastPacket) {
-        this.lastPacket = lastPacket;
     }
 }

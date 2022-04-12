@@ -190,52 +190,6 @@ public class FlowGenerator {
         }
     }
 
-    public int dumpLabeledFlowBasedFeatures(String path, String filename, String header) {
-        BasicFlow flow;
-        int total = 0;
-        int zeroPkt = 0;
-
-        try {
-            //total = finishedFlows.size()+currentFlows.size(); becasue there are 0 packet BasicFlow in the currentFlows
-
-            FileOutputStream output = new FileOutputStream(path + filename);
-            logger.debug("dumpLabeledFlow: ", path + filename);
-            output.write((header + "\n").getBytes());
-            Set<Integer> fkeys = finishedFlows.keySet();
-            for (Integer key : fkeys) {
-                flow = finishedFlows.get(key);
-                if (flow.getPacketCount() > 1) {
-                    output.write((flow.dumpFlowBasedFeaturesEx() + "\n").getBytes());
-                    total++;
-                } else {
-                    zeroPkt++;
-                }
-            }
-            logger.debug("dumpLabeledFlow finishedFlows -> {},{}", zeroPkt, total);
-
-            Set<String> ckeys = currentFlows.keySet();
-            output.write((header + "\n").getBytes());
-            for (String key : ckeys) {
-                flow = currentFlows.get(key);
-                if (flow.getPacketCount() > 1) {
-                    output.write((flow.dumpFlowBasedFeaturesEx() + "\n").getBytes());
-                    total++;
-                } else {
-                    zeroPkt++;
-                }
-
-            }
-            logger.debug("dumpLabeledFlow total(include current) -> {},{}", zeroPkt, total);
-            output.flush();
-            output.close();
-        } catch (IOException e) {
-
-            logger.debug(e.getMessage());
-        }
-
-        return total;
-    }
-
     public long dumpLabeledCurrentFlow(String fileFullPath, String header) {
         if (fileFullPath == null || header == null) {
             String ex = String.format("fullFilePath=%s,filename=%s", fileFullPath);

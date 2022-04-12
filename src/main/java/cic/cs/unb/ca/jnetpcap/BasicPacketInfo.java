@@ -9,7 +9,6 @@ import java.util.Arrays;
 public class BasicPacketInfo {
 
     /*  Basic Info to generate flows from packets  	*/
-    private long id;
     private byte[] src;
     private byte[] dst;
     private int srcPort;
@@ -36,11 +35,7 @@ public class BasicPacketInfo {
 
     private boolean isWrongFragment = false;
 
-    public BasicPacketInfo(IdGenerator generator) {
-        super();
-        this.id = generator.nextId();
-    }
-
+    public BasicPacketInfo() { }
 
     public String generateFlowId() {
         boolean forward = true;
@@ -72,10 +67,6 @@ public class BasicPacketInfo {
         return this.flowId;
     }
 
-
-    public String dumpInfo() {
-        return null;
-    }
 
     public int getPayloadPacket() {
         return payloadPacket += 1;
