@@ -15,7 +15,7 @@ public class BasicPacketInfo {
     private int dstPort;
     private int protocol;
     private long timeStamp;
-    private long payloadBytes;
+    private long payloadLength;
     private String flowId = null;
     /* ******************************************** */
     private boolean flagFIN = false;
@@ -27,8 +27,7 @@ public class BasicPacketInfo {
     private boolean flagCWR = false;
     private boolean flagRST = false;
     private int TCPWindow = 0;
-    private long headerBytes;
-    private int payloadPacket = 0;
+    private long headerLength;
     /* ******************************************** */
     private int icmpCode = -1;
     private int icmpType = -1;
@@ -65,11 +64,6 @@ public class BasicPacketInfo {
     public String bwdFlowId() {
         this.flowId = this.getDestinationIP() + "-" + this.getSourceIP() + "-" + this.dstPort + "-" + this.srcPort + "-" + this.protocol;
         return this.flowId;
-    }
-
-
-    public int getPayloadPacket() {
-        return payloadPacket += 1;
     }
 
     public String getSourceIP() {

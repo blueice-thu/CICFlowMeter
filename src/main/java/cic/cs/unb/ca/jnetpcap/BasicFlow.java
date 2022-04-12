@@ -139,15 +139,15 @@ public class BasicFlow {
 
         if (isForwardPacket(packet) || !this.isBidirectional) {
             forward.add(packet);
-            fwdPktStats.addValue((double) packet.getPayloadBytes());
-            fwdHeaderBytes += packet.getHeaderBytes();
-            fwdBytes += packet.getPayloadBytes();
-            minFwdSegmentSize = Math.min(packet.getHeaderBytes(), minFwdSegmentSize);
+            fwdPktStats.addValue((double) packet.getPayloadLength());
+            fwdHeaderBytes += packet.getHeaderLength();
+            fwdBytes += packet.getPayloadLength();
+            minFwdSegmentSize = Math.min(packet.getHeaderLength(), minFwdSegmentSize);
 
-            if (packet.getPayloadBytes() >= 1)
+            if (packet.getPayloadLength() >= 1)
                 fwdPacketsWithData++;
             if (packet.getTCPWindow() == fwdInitWindow)
-                fwdInitWinBytes += packet.getPayloadBytes();
+                fwdInitWinBytes += packet.getPayloadLength();
             else
                 fwdInitWindow = -2; // Should not be used forever
 
@@ -160,15 +160,15 @@ public class BasicFlow {
                 bwdInitWindow = packet.getTCPWindow();
             }
             backward.add(packet);
-            bwdPktStats.addValue((double) packet.getPayloadBytes());
+            bwdPktStats.addValue((double) packet.getPayloadLength());
             bwdInitWinBytes = packet.getTCPWindow();
-            bwdHeaderBytes += packet.getHeaderBytes();
-            bwdBytes += packet.getPayloadBytes();
+            bwdHeaderBytes += packet.getHeaderLength();
+            bwdBytes += packet.getPayloadLength();
 
             if (bwdInitWindow == -1)
                 bwdInitWinBytes = packet.getTCPWindow();
             if (packet.getTCPWindow() == bwdInitWindow)
-                bwdInitWinBytes += packet.getPayloadBytes();
+                bwdInitWinBytes += packet.getPayloadLength();
             else
                 bwdInitWindow = -2; // Should not be used forever
 
@@ -180,7 +180,7 @@ public class BasicFlow {
 
         if (getPacketCount() > 1)
             flowIAT.addValue(packet.getTimeStamp() - flowLastSeenTime);
-        flowLengthStats.addValue((double) packet.getPayloadBytes());
+        flowLengthStats.addValue((double) packet.getPayloadLength());
         flowLastSeenTime = packet.getTimeStamp();
     }
 
@@ -451,11 +451,9 @@ public class BasicFlow {
 
     public void updateForwardBulk(BasicPacketInfo packet, long tsOflastBulkInOther) {
 
-        long size = packet.getPayloadBytes();
+        long size = packet.getPayloadLength();
         if (tsOflastBulkInOther > fwdBulkStartHelper) fwdBulkStartHelper = 0;
         if (size <= 0) return;
-
-        packet.getPayloadPacket();
 
         if (fwdBulkStartHelper == 0) {
             fwdBulkStartHelper = packet.getTimeStamp();
@@ -495,11 +493,9 @@ public class BasicFlow {
 		/*bAvgBytesPerBulk =0;
 		bbulkSizeTotal=0;
 		bbulkStateCount=0;*/
-        long size = packet.getPayloadBytes();
+        long size = packet.getPayloadLength();
         if (tsOflastBulkInOther > bwdBulkStartHelper) bwdBulkStartHelper = 0;
         if (size <= 0) return;
-
-        packet.getPayloadPacket();
 
         if (bwdBulkStartHelper == 0) {
             bwdBulkStartHelper = packet.getTimeStamp();
