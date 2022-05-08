@@ -1,5 +1,11 @@
 # CICFlowMeter
 
+**Too many bugs in this project.**
+
+**Do not advise to use this project.**
+
+**Recommend: https://github.com/blueice-thu/kdd99_feature_extractor**
+
 ## Dependencies
 
 - libpcap (for linux) or winpcap (for windows)
